@@ -38,21 +38,17 @@ class AuthMiddleware
 
         Helper::language(1);
 
-        if (Auth::user() && (Auth::user()->type==1 || Auth::user()->type==2 || Auth::user()->type == 4)) {
+        if (Auth::user() && (Auth::user()->type == 1 || Auth::user()->type == 2 || Auth::user()->type == 4)) {
             if (Auth::user()->type == 4) {
                 $vendor_id = Auth::user()->vendor_id;
             } else {
                 $vendor_id = Auth::user()->id;
             }
-           
+
             date_default_timezone_set(@helper::appdata($vendor_id)->timezone);
             return $next($request);
-
         }
 
         return redirect('admin');
-
     }
-
 }
-

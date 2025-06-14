@@ -14,9 +14,10 @@
                             @error('refund_policy')
                                 <span class="text-danger">{{ $message }}</span><br>
                             @enderror
-                            <div class="form-group {{session()->get('direction') == 2 ? 'text-start' : 'text-end'}}">
-                               
-                                <button class="btn btn-primary px-sm-4 my-2 {{ Auth::user()->type == 4 ? (helper::check_access('role_cms_pages', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 || helper::check_access('role_cms_pages', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                            <div class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
+
+                                <button
+                                    class="btn btn-primary px-sm-4 my-2 {{ Auth::user()->type == 4 ? (helper::check_access('role_cms_pages', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
                                     @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif>{{ trans('labels.save') }}</button>
                             </div>
                         </form>

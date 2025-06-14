@@ -37,9 +37,9 @@
     <section class="cart">
         <div class="container">
             @if (count($getcartlist) > 0)
-            @if (@helper::checkaddons('cart_checkout_countdown'))
-            @include("web.cart_checkout_countdown")
-            @endif
+                @if (@helper::checkaddons('cart_checkout_countdown'))
+                    @include('web.cart_checkout_countdown')
+                @endif
                 <div class="table-responsive cart-table cart-view">
                     <table class="table m-0 rounded-2 overflow-hidden">
                         <thead>
@@ -147,16 +147,14 @@
                     </table>
                 </div>
 
+                @if (helper::appdata($vendordata->id)->product_type == 1)
+                    <p class="muted text-end fs-7 line-2 mt-2"> {{ trans('labels.cart_progress_description') }}</p>
+                    @if (@helper::checkaddons('cart_checkout_progressbar'))
+                        @include('web.cart_checkout_progressbar')
+                    @endif
+                @endif
 
-
-                <p class="muted {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }} fs-7 line-2 mt-2"> Shipping, taxes, and discounts codes calculated at checkout. (if applicable)</p>
-
-                <!--@if (@helper::checkaddons('cart_checkout_progressbar'))-->
-                <!--@include("web.cart_checkout_progressbar")-->
-                <!--@endif-->
-                
                 <div class="row g-3 justify-content-between pt-3 mb-sm-5 mb-3">
-                    
                     <div class="col-lg-3 col-md-4 col-sm-6">
                         <a href="{{ URL::to(@$vendordata->slug . '/') }}" type="button"
                             class="btn fs-14 fw-500 btn-fashion w-100">
@@ -164,13 +162,13 @@
                             <span class="fw-600 px-1">{{ trans('labels.back_top_shop') }}</span>
                         </a>
                     </div>
-                    
+
                     <div class="col-lg-3 col-md-4 col-sm-6">
                         @if (@helper::checkaddons('customer_login'))
                             @if (helper::appdata(@$vendordata->id)->checkout_login_required == 1)
                                 @if (Auth::user() && Auth::user()->type == 3)
                                     <a class="btn btn-primary rounded-0 py-2 fs-14 w-100"
-                                        onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout') }}')"><span>{{ trans('labels.go_to_checkout') }}</span></a>
+                                        onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout?buynow=0') }}')"><span>{{ trans('labels.go_to_checkout') }}</span></a>
                                 @else
                                     @if (helper::appdata(@$vendordata->id)->is_checkout_login_required == 1)
                                         <a type="button" class="btn btn-fashion w-100"
@@ -186,11 +184,11 @@
                                 @endif
                             @else
                                 <a class="btn btn-primary rounded-0 py-2 fs-14 w-100"
-                                    onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout') }}')"><span>{{ trans('labels.go_to_checkout') }}</span></a>
+                                    onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout?buynow=0') }}')"><span>{{ trans('labels.go_to_checkout') }}</span></a>
                             @endif
                         @else
                             <a class="btn btn-primary rounded-0 py-2 fs-14 w-100"
-                                onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout') }}')"
+                                onclick="checkout('0','{{ URL::to(@$vendordata->slug . '/checkout?buynow=0') }}')"
                                 href="{{ URL::to(@$vendordata->slug . '/checkout') }}"><span>{{ trans('labels.go_to_checkout') }}</span></a>
                         @endif
                     </div>
@@ -219,7 +217,8 @@
             if (variations != '') {
                 html += '<p class="fw-600 m-0 text-dark" id="variation_title">' + variation_title +
                     '</p><ul class="mt-1 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
-                html += '<li class="px-0 fw-500 fs-7 my-1 d-flex align-items-center justify-content-between">' + variations + '<span class="text-dark fs-7">' +
+                html += '<li class="px-0 fw-500 fs-7 my-1 d-flex align-items-center justify-content-between">' +
+                    variations + '<span class="text-dark fs-7">' +
                     currency_formate(parseFloat(
                         variation_price)) + '</span></li>'
                 html += '</ul>';
@@ -228,9 +227,11 @@
             var html1 = '';
             if (extras != '') {
                 $('#extras_title').removeClass('d-none');
-                html1 += '<p class="fw-600 m-0" id="extras_title">' + extra_title + '</p><ul class="m-0 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
+                html1 += '<p class="fw-600 m-0" id="extras_title">' + extra_title +
+                    '</p><ul class="m-0 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
                 for (i in extras) {
-                    html1 += '<li class="px-0 fw-500 fs-7 d-flex my-1 align-items-center justify-content-between">' + extras[i] + '<span class="text-dark fs-7">' +
+                    html1 += '<li class="px-0 fw-500 fs-7 d-flex my-1 align-items-center justify-content-between">' +
+                        extras[i] + '<span class="text-dark fs-7">' +
                         currency_formate(parseFloat(
                             extra_price[i])) + '</span></li>'
                 }

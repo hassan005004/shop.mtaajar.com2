@@ -57,9 +57,7 @@
     @if (@helper::checkaddons('subscription'))
         @if (@helper::checkaddons('pwa'))
             @php
-                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)
-                    ->orderByDesc('id')
-                    ->first();
+                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)->orderByDesc('id')->first();
                 $user = App\Models\User::where('id', $vendordata->id)->first();
                 if ($user->allow_without_subscription == 1) {
                     $pwa = 1;
@@ -83,9 +81,7 @@
     @if (@helper::checkaddons('subscription'))
         @if (@helper::checkaddons('pixel'))
             @php
-                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)
-                    ->orderByDesc('id')
-                    ->first();
+                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)->orderByDesc('id')->first();
                 $user = App\Models\User::where('id', $vendordata->id)->first();
                 if ($user->allow_without_subscription == 1) {
                     $pixel = 1;
@@ -166,12 +162,13 @@
                                 <div>
                                     <div class="search-content text-capitalize">
 
-                                        <p class="fs-6 fw-600">{{ trans('labels.search_modal_title') }}</p>
+                                        <p class="fs-6 fw-600">what are you looking for ?</p>
                                     </div>
                                     <input type="text" placeholder="Search Product..."
                                         class="py-2 w-100 px-2 my-2 border rounded-2" name="name"
                                         value="{{ isset($_GET['name']) ? $_GET['name'] : '' }}" required>
-                                    <p class="text-truncate fs-7">{{ trans('labels.search_modal_description') }}</p>
+                                    <p class="text-truncate fs-7">Ex.accessories, man, dresses, etc...
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -197,8 +194,7 @@
     </div>
 
     <!-- Modal -->
-    @if (helper::appdata($vendordata->id)->subscribe_newsletter == 1)
-        <div class="modal fade" id="subsciptionmodal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="subsciptionmodal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content bg-lights">
@@ -240,7 +236,6 @@
             </div>
         </div>
     </div>
-    @endif
 
     <!-- pro-view Modal -->
     <div class="modal fade" id="viewproduct-over" tabindex="-1" aria-labelledby="pro-view" aria-hidden="true">
@@ -260,7 +255,8 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header justify-content-between align-items-center">
-                            <h2 class="text-start mb-0 text-dark fw-medium fs-4">Checkout as Guest</h2>
+                            <h2 class="text-start mb-0 text-dark fw-medium fs-4">{{ trans('labels.checkout_guest') }}
+                            </h2>
                             <button type="button" class="btn_close btn shadow m-0" data-bs-dismiss="modal"
                                 aria-label="Close">
                                 <i class="fa-solid fa-xmark text-dark"></i>
@@ -268,10 +264,8 @@
                         </div>
 
                         <div class="modal-body text-center">
-                            <p class="text-start mb-3 fs-7 text-dark">Don't have an account? Don't worry! You can
-                                complete
-                                your
-                                checkout process as a guest & choose to create an account later</p>
+                            <p class="text-start mb-3 fs-7 text-dark">{{ trans('labels.checkout_guest_description') }}
+                            </p>
                         </div>
                         <div class="modal-footer">
                             <div class="d-md-flex justify-content-between align-items-center w-100">
@@ -279,7 +273,7 @@
                                 <a href="{{ URL::to(@$vendordata->slug . '/login') }}"
                                     class="btn btn-fashion-outline w-100">{{ trans('labels.login_with_your_account') }}</a>
 
-                                <a href="{{ URL::to(@$vendordata->slug . '/checkout') }}"
+                                <a href="{{ URL::to(@$vendordata->slug . '/checkout?buynow=0') }}"
                                     class="btn btn-fashion w-100 mt-4 mt-md-0 {{ session()->get('direction') == 2 ? 'me-md-4' : 'ms-md-4' }}">{{ trans('labels.continue_as_guest') }}</a>
 
                             </div>
@@ -340,57 +334,43 @@
                     method="POST">
                     <div class="modal-body">
                         @csrf
-                        <input type="hidden" name="modal_vendor_slug" id="modal_vendor_slug" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_user_name" id="modal_user_name" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_user_email" id="modal_user_email" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_user_mobile" id="modal_user_mobile" class="form-control"
-                            value="">
+                        <input type="hidden" name="modal_vendor_slug" id="modal_vendor_slug" value="">
+                        <input type="hidden" name="modal_user_name" id="modal_user_name" value="">
+                        <input type="hidden" name="modal_user_email" id="modal_user_email" value="">
+                        <input type="hidden" name="modal_user_mobile" id="modal_user_mobile" value="">
                         <input type="hidden" name="modal_billing_address" id="modal_billing_address"
-                            class="form-control" value="">
+                            value="">
                         <input type="hidden" name="modal_billing_landmark" id="modal_billing_landmark"
-                            class="form-control" value="">
+                            value="">
                         <input type="hidden" name="modal_billing_postal_code" id="modal_billing_postal_code"
-                            class="form-control" value="">
-                        <input type="hidden" name="modal_billing_city" id="modal_billing_city" class="form-control"
                             value="">
-                        <input type="hidden" name="modal_billing_state" id="modal_billing_state"
-                            class="form-control" value="">
+                        <input type="hidden" name="modal_billing_city" id="modal_billing_city" value="">
+                        <input type="hidden" name="modal_billing_state" id="modal_billing_state" value="">
                         <input type="hidden" name="modal_billing_country" id="modal_billing_country"
-                            class="form-control" value="">
+                            value="">
                         <input type="hidden" name="modal_shipping_address" id="modal_shipping_address"
-                            class="form-control" value="">
+                            value="">
                         <input type="hidden" name="modal_shipping_landmark" id="modal_shipping_landmark"
-                            class="form-control" value="">
-                        <input type="hidden" name="modal_postal_code" id="modal_postal_code" class="form-control"
                             value="">
-                        <input type="hidden" name="modal_shipping_city" id="modal_shipping_city"
-                            class="form-control" value="">
-                        <input type="hidden" name="modal_shipping_state" id="modal_shipping_state"
-                            class="form-control" value="">
+                        <input type="hidden" name="modal_postal_code" id="modal_postal_code" value="">
+                        <input type="hidden" name="modal_shipping_city" id="modal_shipping_city" value="">
+                        <input type="hidden" name="modal_shipping_state" id="modal_shipping_state" value="">
                         <input type="hidden" name="modal_shipping_country" id="modal_shipping_country"
-                            class="form-control" value="">
-                        <input type="hidden" name="modal_shipping_area" id="modal_shipping_area"
-                            class="form-control" value="">
+                            value="">
+                        <input type="hidden" name="modal_shipping_area" id="modal_shipping_area" value="">
                         <input type="hidden" name="modal_delivery_charge" id="modal_delivery_charge"
-                            class="form-control" value="">
-                        <input type="hidden" name="modal_grand_total" id="modal_grand_total" class="form-control"
                             value="">
-                        <input type="hidden" name="modal_sub_total" id="modal_sub_total" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_tax" id="modal_tax" class="form-control" value="">
-                        <input type="hidden" name="modal_tax_name" id="modal_tax_name" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_notes" id="modal_notes" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_offer_code" id="modal_offer_code" class="form-control"
-                            value="">
-                        <input type="hidden" name="modal_offer_amount" id="modal_offer_amount" class="form-control"
-                            value="">
+                        <input type="hidden" name="modal_grand_total" id="modal_grand_total" value="">
+                        <input type="hidden" name="modal_tips" id="modal_tips" value="">
+                        <input type="hidden" name="modal_sub_total" id="modal_sub_total" value="">
+                        <input type="hidden" name="modal_tax" id="modal_tax" value="">
+                        <input type="hidden" name="modal_tax_name" id="modal_tax_name" value="">
+                        <input type="hidden" name="modal_notes" id="modal_notes" value="">
+                        <input type="hidden" name="modal_offer_code" id="modal_offer_code" value="">
+                        <input type="hidden" name="modal_offer_amount" id="modal_offer_amount" value="">
                         <input type="hidden" name="modal_transaction_type" id="modal_transaction_type"
-                            class="form-control" value="">
+                            value="">
+                        <input type="hidden" name="modal_buynow" id="modal_buynow" value="">
 
                         <p>{{ trans('labels.payment_description') }}</p>
                         <hr>
@@ -485,14 +465,22 @@
         var formate = "{{ helper::appdata($vendordata->id)->currency_formate }}";
 
         // top deals parameter
-        var start_date = "{{ @$topdeals->start_date }}";
-        var start_time = "{{ @$topdeals->start_time }}";
-        var end_date = "{{ @$topdeals->end_date }}";
-        var end_time = "{{ @$topdeals->end_time }}";
+        var start_date = "{{ @helper::top_deals($vendordata->id)->start_date }}";
+        var start_time = "{{ @helper::top_deals($vendordata->id)->start_time }}";
+        var end_date = "{{ @helper::top_deals($vendordata->id)->end_date }}";
+        var end_time = "{{ @helper::top_deals($vendordata->id)->end_time }}";
+        @if (@helper::checkaddons('top_deals'))
+            var enddate = "{{ @App\Models\TopDeals::where('vendor_id', $vendordata->id)->first()->end_date }}";
+            var endtime = "{{ @App\Models\TopDeals::where('vendor_id', $vendordata->id)->first()->end_time }}";
+        @else
+            var enddate = null;
+            var endtime = null;
+        @endif
         var topdeals = "{{ !empty($topdealsproducts) ? 1 : 0 }}";
         var time_zone = "{{ helper::appdata($vendordata->id)->timezone }}";
         var current_date = "{{ \Carbon\Carbon::now()->toDateString() }}";
-        var deal_type = "{{ @$topdeals->deal_type }}";
+        var deal_type = "{{ @helper::top_deals($vendordata->id)->deal_type }}";
+        var siteurl = "{{ URL::to($vendordata->slug) }}";
         // top deals parameter
     </script>
 
@@ -527,9 +515,7 @@
     @if (@helper::checkaddons('subscription'))
         @if (@helper::checkaddons('pwa'))
             @php
-                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)
-                    ->orderByDesc('id')
-                    ->first();
+                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)->orderByDesc('id')->first();
                 $user = App\Models\User::where('id', $vendordata->id)->first();
                 if ($user->allow_without_subscription == 1) {
                     $pwa = 1;
@@ -608,9 +594,7 @@
     @if (@helper::checkaddons('subscription'))
         @if (@helper::checkaddons('whatsapp_message'))
             @php
-                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)
-                    ->orderByDesc('id')
-                    ->first();
+                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)->orderByDesc('id')->first();
                 $user = App\Models\User::where('id', $vendordata->id)->first();
                 if (@$user->allow_without_subscription == 1) {
                     $whatsapp_message = 1;
@@ -619,93 +603,99 @@
                 }
 
             @endphp
-            @if ($whatsapp_message == 1 && helper::appdata($vendordata->id)->whatsapp_chat_on_off == 1)
-                <input type="checkbox" id="check">
-                <label
-                    class="chat-btn {{ helper::appdata($vendordata->id)->whatsapp_chat_position == 1 ? 'chat-btn_rtl' : 'chat-btn_ltr' }}"
-                    for="check">
-                    <i class="fa-brands fa-whatsapp comment"></i>
-                    <i class="fa fa-close close"></i>
-                </label>
-
+            @if ($whatsapp_message == 1 && @whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_on_off == 1)
                 <div
-                    class="shadow {{ helper::appdata($vendordata->id)->whatsapp_chat_position == 1 ? 'wrapper_rtl' : 'wrapper' }}">
-                    <div class="msg_header">
-                        <h6>{{ helper::appdata(@$vendordata->id)->web_title }}</h6>
-                    </div>
+                    class="{{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_mobile_view_on_off == 1 ? 'd-block' : 'd-lg-block d-none' }}">
+                    <input type="checkbox" id="check">
+                    <label
+                        class="chat-btn {{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_position == 1 ? 'chat-btn_rtl' : 'chat-btn_ltr' }}"
+                        for="check">
+                        <i class="fa-brands fa-whatsapp comment"></i>
+                        <i class="fa fa-close close"></i>
+                    </label>
 
-                    <div class="text-start p-3 bg-msg">
-                        <div class="card p-2 msg d-inline-block fs-7">
-                            {{ trans('labels.how_can_help_you') }}
+                    <div
+                        class="shadow {{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_position == 1 ? 'wrapper_rtl' : 'wrapper' }}">
+                        <div class="msg_header">
+                            <h6>{{ helper::appdata(@$vendordata->id)->web_title }}</h6>
                         </div>
-                    </div>
 
-                    <div class="chat-form">
+                        <div class="text-start p-3 bg-msg">
+                            <div class="card p-2 msg d-inline-block fs-7">
+                                {{ trans('labels.how_can_help_you') }}
+                            </div>
+                        </div>
 
-                        <form action="https://api.whatsapp.com/send" method="get" target="_blank"
-                            class="d-flex align-items-center d-grid gap-2">
-                            <textarea class="form-control m-0" name="text" placeholder="{{ trans('messages.your_text_message') }}"
-                                cols="30" rows="10" required></textarea>
-                            <input type="hidden" name="phone"
-                                value="{{ helper::appdata($vendordata->id)->whatsapp_number }}">
-                            <button type="submit" class="btn btn-whatsapp btn-block m-0">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </form>
+                        <div class="chat-form">
 
+                            <form action="https://api.whatsapp.com/send" method="get" target="_blank"
+                                class="d-flex align-items-center d-grid gap-2">
+                                <textarea class="form-control m-0" name="text" placeholder="{{ trans('messages.your_text_message') }}"
+                                    cols="30" rows="10" required></textarea>
+                                <input type="hidden" name="phone"
+                                    value="{{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}">
+                                <button type="submit" class="btn btn-whatsapp btn-block m-0">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+
+                        </div>
                     </div>
                 </div>
             @endif
         @endif
     @else
         @if (@helper::checkaddons('whatsapp_message'))
-            @if (helper::appdata($vendordata->id)->whatsapp_chat_on_off == 1)
-                <input type="checkbox" id="check">
-                <label
-                    class="chat-btn {{ helper::appdata($vendordata->id)->whatsapp_chat_position == 1 ? 'chat-btn_rtl' : 'chat-btn_ltr' }}"
-                    for="check">
-                    <i class="fa-brands fa-whatsapp comment"></i>
-                    <i class="fa fa-close close"></i>
-                </label>
-
+            @if (@whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_on_off == 1)
                 <div
-                    class="shadow {{ helper::appdata($vendordata->id)->whatsapp_chat_position == 1 ? 'wrapper_rtl' : 'wrapper' }}">
-                    <div class="msg_header">
-                        <h6>{{ helper::appdata(@$vendordata->id)->web_title }}</h6>
-                    </div>
+                    class="{{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_mobile_view_on_off == 1 ? 'd-block' : 'd-lg-block d-none' }}">
+                    <input type="checkbox" id="check">
+                    <label
+                        class="chat-btn {{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_position == 1 ? 'chat-btn_rtl' : 'chat-btn_ltr' }}"
+                        for="check">
+                        <i class="fa-brands fa-whatsapp comment"></i>
+                        <i class="fa fa-close close"></i>
+                    </label>
 
-                    <div class="text-start p-3 bg-msg">
-                        <div class="card p-2 msg d-inline-block fs-7">
-                            {{ trans('labels.how_can_help_you') }}
+                    <div
+                        class="shadow {{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_chat_position == 1 ? 'wrapper_rtl' : 'wrapper' }}">
+                        <div class="msg_header">
+                            <h6>{{ helper::appdata(@$vendordata->id)->web_title }}</h6>
                         </div>
-                    </div>
 
-                    <div class="chat-form">
-                        <form action="https://api.whatsapp.com/send" method="get" target="_blank"
-                            class="d-flex align-items-center d-grid gap-2">
-                            <textarea class="form-control m-0" name="text" placeholder="{{ trans('messages.your_text_message') }}"
-                                cols="30" rows="10" required></textarea>
-                            <input type="hidden" name="phone"
-                                value="{{ helper::appdata($vendordata->id)->whatsapp_number }}">
-                            <button type="submit" class="btn btn-whatsapp btn-block m-0">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </form>
+                        <div class="text-start p-3 bg-msg">
+                            <div class="card p-2 msg d-inline-block fs-7">
+                                {{ trans('labels.how_can_help_you') }}
+                            </div>
+                        </div>
+
+                        <div class="chat-form">
+                            <form action="https://api.whatsapp.com/send" method="get" target="_blank"
+                                class="d-flex align-items-center d-grid gap-2">
+                                <textarea class="form-control m-0" name="text" placeholder="{{ trans('messages.your_text_message') }}"
+                                    cols="30" rows="10" required></textarea>
+                                <input type="hidden" name="phone"
+                                    value="{{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}">
+                                <button type="submit" class="btn btn-whatsapp btn-block m-0">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             @endif
         @endif
     @endif
+    <!--Start of Tawk.to Script-->
     @if (@helper::checkaddons('tawk_addons'))
-        <!--Start of Tawk.to Script-->
         @if (helper::appdata($vendordata->id)->tawk_on_off == 1)
             {!! helper::appdata($vendordata->id)->tawk_widget_id !!}
         @endif
     @endif
     <!--End of Tawk.to Script-->
+    <!-- Wizz Chat -->
     @if (@helper::checkaddons('wizz_chat'))
         @if (helper::appdata($vendordata->id)->wizz_chat_on_off == 1)
-            <!-- Wizz Chat -->
             {!! helper::appdata($vendordata->id)->wizz_chat_settings !!}
         @endif
     @endif
@@ -713,7 +703,10 @@
     <!-- Quick call -->
     @if (@helper::checkaddons('quick_call'))
         @if (@helper::appdata($vendordata->id)->quick_call == 1)
-            @include('web.quick_call')
+            <div
+                class="{{ helper::appdata($vendordata->id)->quick_call_mobile_view_on_off == 1 ? 'd-block' : 'd-lg-block d-none' }}">
+                @include('web.quick_call')
+            </div>
         @endif
     @endif
 
@@ -830,8 +823,7 @@
                                     },
                                     url: "{{ URL::to('get_notification_data') }}",
 
-                                    type: "post",
-                                    dataType: "json",
+                                    method: "POST",
                                     data: {
                                         vendor_id: "{{ $vendordata->id }}",
                                     },

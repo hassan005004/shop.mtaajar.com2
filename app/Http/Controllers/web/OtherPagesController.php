@@ -190,7 +190,7 @@ class OtherPagesController extends Controller
         if (empty($vendordata)) {
             abort(404);
         }
-        $images = Gallery::where('vendor_id', $vdata)->orderBy('reorder_id')->get();
+        $images = Gallery::where('vendor_id', $vendordata->id)->orderBy('reorder_id')->get();
         return view('web.gallery.index', compact('vendordata', 'images'));
     }
     public function faqs(Request $request)

@@ -3,7 +3,7 @@
         <div class="card-header bg-secondary sub-plan text-light">
             <div class="d-flex justify-content-between">
                 <h5 class="text-light">{{ $plandata->name }}</h5>
-                @if (Auth::user()->type == 1)
+                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                     <a tooltip="{{ trans('labels.move') }}"><i class="fa-light fa-up-down-left-right"></i></a>
                 @endif
             </div>
@@ -178,25 +178,32 @@
 
         </div>
         <div class="card-footer bg-white border-top-0 my-2 text-center">
-            @if (Auth::user()->type == '1')
+            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                 <div class="d-flex justify-content-center gap-2">
                     @if ($plandata->is_available == 1)
                         <a tooltip="{{ trans('labels.active') }}"
                             @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/plan/status_change-' . $plandata->id . '/2') }}')" @endif
-                            class="btn btn-success hov btn-sm"><i class="fas fa-check"></i></a>
+                            class="btn btn-success hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_pricing_plans', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
+                            <i class="fas fa-check"></i>
+                        </a>
                     @elseif ($plandata->is_available == 2)
                         <a tooltip="{{ trans('labels.inactive') }}"
                             @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/plan/status_change-' . $plandata->id . '/1') }}')" @endif
-                            class="btn btn-danger hov btn-sm"><i class="fas fa-close mx-1"></i></a>
+                            class="btn btn-danger hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_pricing_plans', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
+                            <i class="fas fa-close mx-1"></i>
+                        </a>
                     @endif
-                    <a href="{{ URL::to('admin/plan/edit-' . $plandata->id) }}" class="btn btn-info hov btn-sm"
+                    <a href="{{ URL::to('admin/plan/edit-' . $plandata->id) }}"
+                        class="btn btn-info hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_pricing_plans', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
                         tooltip="{{ trans('labels.edit') }}">
-                        <i class="fa-regular fa-pen-to-square"></i> </a>
-                    <a href="javascript:void(0)" class="btn btn-danger hov btn-sm"
-                        @if (env('Environment') == 'sendbox') onclick="myFunction()" @else 
-            onclick="statusupdate('{{ URL::to('admin/plan/delete-' . $plandata->id) }}')" @endif
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </a>
+                    <a href="javascript:void(0)"
+                        class="btn btn-danger hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_pricing_plans', Auth::user()->role_id, Auth::user()->vendor_id, 'delete') == 1 ? '' : 'd-none') : '' }}"
+                        @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/plan/delete-' . $plandata->id) }}')" @endif
                         tooltip="{{ trans('labels.delete') }}">
-                        <i class="fa-regular fa-trash"></i></a>
+                        <i class="fa-regular fa-trash"></i>
+                    </a>
                 </div>
             @else
                 @if ($plan_id == $plandata->id)
@@ -210,11 +217,13 @@
                                 @if (@$data['original']['plan_date'] > date('Y-m-d'))
                                     <small class="text-dark d-block">{{ @$data['original']['plan_message'] }}
                                         : <span
-                                            class="text-success">{{ $data['original']['plan_date'] != '' ? helper::date_formate($data['original']['plan_date'], $vendor_id) : '' }}</span></small>
+                                            class="text-success">{{ $data['original']['plan_date'] != '' ? helper::date_formate($data['original']['plan_date'], $vendor_id) : '' }}</span>
+                                    </small>
                                 @else
                                     <small class="text-dark d-block">{{ @$data['original']['plan_message'] }}
                                         : <span
-                                            class="text-danger">{{ $data['original']['plan_date'] != '' ? helper::date_formate($data['original']['plan_date'], $vendor_id) : '' }}</span></small>
+                                            class="text-danger">{{ $data['original']['plan_date'] != '' ? helper::date_formate($data['original']['plan_date'], $vendor_id) : '' }}</span>
+                                    </small>
                                 @endif
                             @endif
 

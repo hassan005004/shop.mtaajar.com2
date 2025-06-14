@@ -24,15 +24,10 @@
         <div class="container">
             @php
                 $subtotal = 0;
-
-            @endphp
-            @foreach ($getcartlist as $cartdata)
-                @php
-
+                foreach ($getcartlist as $cartdata) {
                     $subtotal += $cartdata->product_price * $cartdata->qty;
-                    $productprice = $cartdata->price;
-                @endphp
-            @endforeach
+                }
+            @endphp
 
             @if (count($getcartlist) > 0)
                 @if (@helper::checkaddons('cart_checkout_countdown'))
@@ -237,15 +232,19 @@
                                             </h5>
 
                                             <div class="d-flex gap-3 align-items-center">
-                                                <input type="text" class="form-control rounded-2 input-h"
+                                                <input type="text" class="form-control rounded-0 input-h"
                                                     value="{{ Session::has('offer_code') ? Session::get('offer_code') : '' }}"
                                                     name="promocode" id="couponcode"
                                                     placeholder="{{ trans('labels.enter_coupon_code') }}" readonly>
 
-                                                <button class="btn btn-md mb-0 d-none bg-black text-white" id="btnremove"
+                                                <button
+                                                    class="btn btn-md mb-0 d-none bg-black text-white input-h rounded-0"
+                                                    id="btnremove"
                                                     onclick="RemoveCopon()">{{ trans('labels.remove') }}</button>
 
-                                                <button class="btn btn-md mb-0 d-block bg-black text-white" id="btnapply"
+                                                <button
+                                                    class="btn btn-md mb-0 d-block bg-black text-white input-h rounded-0"
+                                                    id="btnapply"
                                                     onclick="ApplyCopon()">{{ trans('labels.apply') }}</button>
                                             </div>
                                         </div>
@@ -263,55 +262,62 @@
                                         </h5>
 
                                         <div class="d-flex align-items-center">
-                                            <input type="text" class="form-control rounded-2 input-h"
+                                            <input type="text" class="form-control rounded-0 input-h"
                                                 value="{{ Session::has('offer_code') ? Session::get('offer_code') : '' }}"
                                                 name="promocode" id="couponcode"
-                                                placeholder="{{ trans('labels.coupon_code') }}" readonly>
+                                                placeholder="{{ trans('labels.enter_coupon_code') }}" readonly>
 
-                                            <button class="btn btn-md btnapply mx-2 mb-0 bg-black text-white d-none"
+                                            <button
+                                                class="btn btn-md btnapply mx-2 mb-0 bg-black text-white d-none input-h rounded-0"
                                                 onclick="RemoveCopon()">{{ trans('labels.remove') }}</button>
 
-                                            <button class="btn btn-md btnapply mx-2 mb-0 bg-black text-white d-block"
+                                            <button
+                                                class="btn btn-md btnapply mx-2 mb-0 bg-black text-white d-block input-h rounded-0"
                                                 onclick="ApplyCopon()">{{ trans('labels.apply') }}</button>
                                         </div>
                                     </div>
                                 </div>
                             @endif
                         @endif
-                        @if (helper::appdata($vendordata->id)->product_type == 1)
-                            <div class="shipping-area-info bg-light card border-0 rounded-0 mb-3 p-2">
-                                <div class="card-body">
-                                    <p class="fs-5 text-dark fw-600 pb-2 mb-3 border-bottom">
-                                        {{ trans('labels.shipping_area') }}</p>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-0">
-                                                <select class="form-select rounded-0" name="shipping_area"
-                                                    id="shipping_area">
-                                                    <option value="" selected disabled> {{ trans('labels.select') }}
+                        @if (@helper::checkaddons('shipping_area'))
+                            @if (helper::appdata($vendordata->id)->shipping_area == 1)
+                                @if (count($getshippingarealist) > 0)
+                                    <div class="card bg-light bg-light border-0 rounded-0 mb-3 p-2 shipping-area-info">
+                                        <div class="card-body">
+                                            <h5
+                                                class="text-dark fw-600 pb-2 mb-3 border-bottom {{ session()->get('direction') == '2' ? 'text-right' : '' }}">
+                                                <i class="fa-regular fa-truck-fast"></i>
+                                                <span
+                                                    class="px-2 checkoutform-title">{{ trans('labels.shipping_area') }}</span>
+                                            </h5>
+
+                                            <div class="d-flex align-items-center">
+                                                <select name="shipping_area" id="shipping_area"
+                                                    class="form-select rounded-0 input-h">
+                                                    <option value="" selected disabled>{{ trans('labels.select') }}
                                                     </option>
-                                                    @forelse ($getshippingarealist as $shippingarea)
+                                                    @foreach ($getshippingarealist as $shippingarea)
                                                         <option value="{{ $shippingarea->id }}"
                                                             data-delivery-charge="{{ $shippingarea->delivery_charge }}"
-                                                            data-area-name="{{ $shippingarea->name }}">
-                                                            {{ $shippingarea->name }}
-                                                            @if ($shippingarea->delivery_charge > 0)
-                                                                {{ trans('labels.delivery_charge') }} :
-                                                                {{ helper::currency_formate($shippingarea->delivery_charge, @$vendordata->id) }}
+                                                            data-area-name="{{ $shippingarea->area_name }}">
+                                                            {{ $shippingarea->area_name }}
+                                                            @if (helper::appdata($vendordata->id)->min_order_amount_for_free_shipping > $subtotal)
+                                                                @if ($shippingarea->delivery_charge > 0)
+                                                                    {{ trans('labels.delivery_charge') }}
+                                                                    :
+                                                                    {{ helper::currency_formate($shippingarea->delivery_charge, @$vendordata->id) }}
+                                                                @endif
                                                             @else
                                                                 {{ trans('labels.free_delivery') }}
                                                             @endif
                                                         </option>
-                                                    @empty
-                                                        <option value="" selected disabled>
-                                                            {{ trans('labels.nodata_found') }} </option>
-                                                    @endforelse
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                @endif
+                            @endif
                         @endif
                         <div class="card bg-light bg-light border-0 rounded-0 mb-3 p-2">
                             <div class="card-body">
@@ -357,16 +363,119 @@
                                             <span>{{ helper::currency_formate($rate, @$vendordata->id) }}</span>
                                         </li>
                                     @endforeach
-                                    @php
-                                        $grand_total = $subtotal - $discount + $totalcarttax;
-                                    @endphp
 
+                                    @if (helper::appdata($vendordata->id)->product_type == 1)
+                                        <li
+                                            class="list-group-item d-flex align-items-center border-0 px-0 justify-content-between bg-light delivery-charge-section">
+                                            <span>{{ trans('labels.delivery_charge') }}</span>
+                                            @if (@helper::checkaddons('shipping_area'))
+                                                @if (helper::appdata($vendordata->id)->shipping_area == 1)
+                                                    @if (count($getshippingarealist) > 0)
+                                                        @php
+                                                            $grand_total = $subtotal - $discount + $totalcarttax;
+                                                        @endphp
+                                                        @if ($subtotal >= helper::appdata($vendordata->id)->min_order_amount_for_free_shipping)
+                                                            <input type="hidden" name="delivery_charge"
+                                                                id="delivery_charge" value="0">
 
-                                    <li
-                                        class="list-group-item d-flex align-items-center border-0 px-0 justify-content-between bg-light delivery-charge-section d-none">
-                                        <span>{{ trans('labels.delivery_charge') }}</span>
-                                        <span class="delivery_charge"></span>
-                                    </li>
+                                                            <span
+                                                                class="delivery_charge">{{ trans('labels.free') }}</span>
+                                                        @else
+                                                            <span
+                                                                class="delivery_charge">{{ helper::currency_formate(0, @$vendordata->id) }}</span>
+
+                                                            <input type="hidden" name="delivery_charge"
+                                                                id="delivery_charge" value="0">
+                                                        @endif
+                                                    @else
+                                                        @if ($subtotal >= helper::appdata($vendordata->id)->min_order_amount_for_free_shipping)
+                                                            @php
+                                                                $grand_total = $subtotal - $discount + $totalcarttax;
+                                                            @endphp
+
+                                                            <input type="hidden" name="delivery_charge"
+                                                                id="delivery_charge" value="0">
+
+                                                            <span
+                                                                class="delivery_charge">{{ trans('labels.free') }}</span>
+                                                        @else
+                                                            @php
+                                                                $grand_total =
+                                                                    $subtotal -
+                                                                    $discount +
+                                                                    $totalcarttax +
+                                                                    helper::appdata($vendordata->id)->shipping_charges;
+                                                            @endphp
+
+                                                            <span
+                                                                class="delivery_charge">{{ helper::currency_formate(helper::appdata($vendordata->id)->shipping_charges, @$vendordata->id) }}</span>
+
+                                                            <input type="hidden" name="delivery_charge"
+                                                                id="delivery_charge"
+                                                                value="{{ helper::appdata($vendordata->id)->shipping_charges }}">
+                                                        @endif
+                                                    @endif
+                                                @else
+                                                    @if ($subtotal >= helper::appdata($vendordata->id)->min_order_amount_for_free_shipping)
+                                                        @php
+                                                            $grand_total = $subtotal - $discount + $totalcarttax;
+                                                        @endphp
+
+                                                        <input type="hidden" name="delivery_charge" id="delivery_charge"
+                                                            value="0">
+
+                                                        <span class="delivery_charge">{{ trans('labels.free') }}</span>
+                                                    @else
+                                                        @php
+                                                            $grand_total =
+                                                                $subtotal -
+                                                                $discount +
+                                                                $totalcarttax +
+                                                                helper::appdata($vendordata->id)->shipping_charges;
+                                                        @endphp
+
+                                                        <span
+                                                            class="delivery_charge">{{ helper::currency_formate(helper::appdata($vendordata->id)->shipping_charges, @$vendordata->id) }}</span>
+
+                                                        <input type="hidden" name="delivery_charge" id="delivery_charge"
+                                                            value="{{ helper::appdata($vendordata->id)->shipping_charges }}">
+                                                    @endif
+                                                @endif
+                                            @else
+                                                @if ($subtotal >= helper::appdata($vendordata->id)->min_order_amount_for_free_shipping)
+                                                    @php
+                                                        $grand_total = $subtotal - $discount + $totalcarttax;
+                                                    @endphp
+
+                                                    <input type="hidden" name="delivery_charge" id="delivery_charge"
+                                                        value="0">
+
+                                                    <span class="delivery_charge">{{ trans('labels.free') }}</span>
+                                                @else
+                                                    @php
+                                                        $grand_total =
+                                                            $subtotal -
+                                                            $discount +
+                                                            $totalcarttax +
+                                                            helper::appdata($vendordata->id)->shipping_charges;
+                                                    @endphp
+
+                                                    <span
+                                                        class="delivery_charge">{{ helper::currency_formate(helper::appdata($vendordata->id)->shipping_charges, @$vendordata->id) }}</span>
+
+                                                    <input type="hidden" name="delivery_charge" id="delivery_charge"
+                                                        value="{{ helper::appdata($vendordata->id)->shipping_charges }}">
+                                                @endif
+                                            @endif
+                                        </li>
+                                    @else
+                                        @php
+                                            $grand_total = $subtotal - $discount + $totalcarttax;
+                                        @endphp
+
+                                        <input type="hidden" name="delivery_charge" id="delivery_charge"
+                                            value="0">
+                                    @endif
 
 
                                     <li
@@ -388,15 +497,43 @@
                                 </h5>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="form-group">
-                                            <textarea class="form-control rounded-0" name="order_notes" id="order_notes" rows="3"
+                                        <div class="form-group m-0">
+                                            <textarea class="form-control m-0 rounded-0" name="order_notes" id="order_notes" rows="3"
                                                 placeholder="{{ trans('labels.order_notes') }} {{ trans('labels.optional') }} "></textarea>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         @include('web.service-trusted')
+                        @if (@helper::checkaddons('vendor_tip'))
+                            @if (@helper::otherappdata($vendordata->id)->tips_settings == 1)
+                                <div class="shipping-area-info bg-light card border-0 rounded-0 mb-3 p-2">
+                                    <div class="card-body">
+                                        <h5 class="text-dark fw-600 pb-2 mb-3 border-bottom">
+                                            <i class="fa-light fa-comment-dollar fs-4"></i>
+                                            <span class="mx-2">
+                                                {{ trans('labels.tips_pro') }}
+                                            </span>
+                                        </h5>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group m-0">
+                                                    <label for="add_amount"
+                                                        class="form-label">{{ trans('labels.add_amount') }}</label>
+                                                    <input type="text"
+                                                        class="form-control input-h rounded-0 numbers_only"
+                                                        name="add_amount" id="add_amount"
+                                                        placeholder="{{ trans('labels.add_amount') }} . . . .">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
                         <div class="card bg-light border-0 rounded-0 mb-3 p-2">
                             <div class="card-body">
                                 <h5 class="text-dark fw-600 border-bottom fw-600 pb-2 mb-3">
@@ -426,7 +563,7 @@
                                                 $transaction_type = $pmdata->payment_type;
                                             @endphp
                                             @if ($systemAddonActivated)
-                                                <label class="form-check-label col-md-6 col-6"
+                                                <label class="form-check-label col-xl-6 col-lg-12 col-md-4 col-sm-6 col-12"
                                                     for="payment{{ $transaction_type }}">
                                                     <input class="form-check-input" type="radio"
                                                         name="transaction_type" id="payment{{ $transaction_type }}"
@@ -437,8 +574,7 @@
                                                         {{ $key++ == 0 ? 'checked' : '' }}>
                                                     <div
                                                         class="{{ @helper::appdata(@$vendordata->id)->web_layout == 2 ? 'payment-gateway-rtl' : 'payment-gateway' }} mb-0 rounded-0 w-100">
-                                                        <span
-                                                            class="text-center d-flex gap-2 justify-content-center align-items-center"><img
+                                                        <span class="d-flex gap-2 w-100 align-items-center"><img
                                                                 src="{{ helper::image_path($pmdata->image) }}"
                                                                 alt=""
                                                                 class="m-0">{{ ucfirst($pmdata->payment_name) }}</span>
@@ -501,15 +637,13 @@
                     </div>
                 </div>
                 <input type="hidden" name="grand_total" id="grand_total" value="{{ $grand_total }}">
-                <input type="hidden" name="product_price" id="product_price" value="{{ $productprice }}">
                 <input type="hidden" name="sub_total" id="sub_total" value="{{ $subtotal }}">
                 <input type="hidden" name="couponcode" id="couponcode" value="{{ @$offer_code }}">
                 <input type="hidden" name="discount_amount" id="discount_amount" value="{{ $discount }}">
                 <input type="hidden" name="totaltax" id="totaltax" value="{{ $totalcarttax }}">
                 <input type="hidden" name="tax_amount" id="tax_amount" value="{{ implode('|', $taxArr['rate']) }}">
                 <input type="hidden" name="tax_name" id="tax_name" value="{{ implode('|', $taxArr['tax']) }}">
-                <input type="hidden" name="delivery_charge" id="delivery_charge" value="0">
-
+                <input type="hidden" id="buynow" name="buynow" value="{{ request()->buynow }}">
                 <input type="hidden" name="vendor_id" id="vendor_id" value="{{ $vendordata->id }}">
                 <form action="{{ url($vendordata->slug . '/placeorder/paypalrequest') }}" method="post"
                     class="d-none">
@@ -561,7 +695,7 @@
 
 
         <!-- offers-label sidebar -->
-        <div class="offcanvas {{ session()->get('direction') == 2 ? 'offcanvas-start' : 'offcanvas-end' }} offers-w w-75"
+        <div class="offcanvas {{ session()->get('direction') == 2 ? 'offcanvas-start' : 'offcanvas-end' }} offers-w"
             tabindex="-1" id="offerslabel" aria-labelledby="offerslabelLabel">
             <div class="offcanvas-header border-bottom bg-light">
                 <h5 class="offcanvas-title offers-title" id="offerslabelLabel"><i class="fa-light fa-badge-percent"></i>
@@ -571,7 +705,7 @@
                     aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <div class="row g-3">
+                <div class="d-flex flex-column gap-3">
                     @if (count(helper::getcoupons(@$vendordata->id)) > 0)
                         @foreach (helper::getcoupons(@$vendordata->id) as $key => $coupon)
                             <div class="card border p-0 h-100">
@@ -595,11 +729,8 @@
                             </div>
                         @endforeach
                     @else
-                        <!--<h5 class="pt-3 m-0 coupon-label line-2">{{ trans('labels.no_offer_found') }}</h5>-->
-                        @include('web.nodata')
+                        <h5 class="pt-3 m-0 coupon-label line-2">{{ trans('labels.no_offer_found') }}</h5>
                     @endif
-
-
                 </div>
             </div>
         </div>
@@ -613,6 +744,7 @@
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
+        var proceed_pay = "{{ trans('labels.proceed_pay') }}";
         let title = {{ Js::from(helper::appdata(@$vendordata->id)->web_title) }}
         let description = "Order Payment";
         let env = {{ Js::from(env('Environment')) }};
@@ -624,6 +756,8 @@
         var checkouturl = "{{ URL::to($vendordata->slug . '/placeorder') }}";
         var min_order_amount = "{{ helper::appdata($vendordata->id)->min_order_amount }}";
         var min_order_amount_msg = "{{ trans('messages.min_order_amount_required') }}";
+        var min_order_amount_for_free_shipping =
+            "{{ helper::appdata($vendordata->id)->min_order_amount_for_free_shipping }}";
 
         $(document).ready(function() {
             if ("{{ Session::has('offer_code') }}") {

@@ -39,7 +39,7 @@
                                 class="circle-round wishlist-btn">
                                 @if (Auth::user() && Auth::user()->type == 3)
                                     @php
-                                        $favorite = helper::ceckfavorite(
+                                        $favorite = helper::checkfavorite(
                                             $getproductdata->id,
                                             $vendordata->id,
                                             Auth::user()->id,

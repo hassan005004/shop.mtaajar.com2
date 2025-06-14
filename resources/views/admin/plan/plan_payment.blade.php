@@ -162,8 +162,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-
-
                         @php
                             $count = App\Models\Promocode::where('vendor_id', 1)->count();
                             $coupons = App\Models\Promocode::where('vendor_id', 1)->get();
@@ -439,47 +437,48 @@
             <input type="hidden" name="return" value="2">
             <input type="submit" class="callpaypal" name="submit">
         </form>
-    @endsection
-    @section('scripts')
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script src="https://js.stripe.com/v3/"></script>
-        <script src="https://js.paystack.co/v1/inline.js"></script>
-        <script src="https://checkout.flutterwave.com/v3.js"></script>
-        <script>
-            function themeinfo(id, theme_id, plan_name) {
-                let string = theme_id;
-                let arr = string.split('|');
-                $('#themeinfoLabel').text(plan_name);
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-                    },
-                    url: "{{ URL::to('admin/themeimages') }}",
-                    method: 'GET',
-                    data: {
-                        theme_id: arr
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        $('#theme_modalbody').html(data.output);
-                        $('#themeinfo').modal('show');
-                    }
-                })
-            }
-        </script>
-        <script>
-            var SITEURL = "{{ URL::to('') }}";
-            var planlisturl = "{{ URL::to('admin/plan') }}";
-            var buyurl = "{{ URL::to('admin/plan/buyplan') }}";
-            var plan_name = "{{ $plan->name }}";
-            var plan_description = "{{ $plan->description }}";
-            var title = "{{ Str::limit(helper::appdata('')->web_title, 50) }}";
-            var description = "Plan Subscription";
-            var applycouponurl = "{{ URL::to('/admin/applycoupon') }}";
-            var removecouponurl = "{{ URL::to('/admin/removecoupon') }}";
-            var offer_code = "{{ session()->has('discount_data') ? session()->get('discount_data')['offer_code'] : '' }}";
-            var discount = "{{ session()->has('discount_data') ? session()->get('discount_data')['offer_amount'] : 0 }}";
-            var sub_total = "{{ $plan->price }}";
-        </script>
-        <script src="{{ url(env('ASSETPATHURL') . 'admin-assets/js/plan_payment.js') }}"></script>
-    @endsection
+    </div>
+@endsection
+@section('scripts')
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script>
+        function themeinfo(id, theme_id, plan_name) {
+            let string = theme_id;
+            let arr = string.split('|');
+            $('#themeinfoLabel').text(plan_name);
+            $.ajax({
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                },
+                url: "{{ URL::to('admin/themeimages') }}",
+                method: 'GET',
+                data: {
+                    theme_id: arr
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#theme_modalbody').html(data.output);
+                    $('#themeinfo').modal('show');
+                }
+            })
+        }
+    </script>
+    <script>
+        var SITEURL = "{{ URL::to('') }}";
+        var planlisturl = "{{ URL::to('admin/plan') }}";
+        var buyurl = "{{ URL::to('admin/plan/buyplan') }}";
+        var plan_name = "{{ $plan->name }}";
+        var plan_description = "{{ preg_replace('/\s+/', ' ', $plan->description) }}";
+        var title = "{{ Str::limit(helper::appdata('')->web_title, 50) }}";
+        var description = "Plan Subscription";
+        var applycouponurl = "{{ URL::to('/admin/applycoupon') }}";
+        var removecouponurl = "{{ URL::to('/admin/removecoupon') }}";
+        var offer_code = "{{ session()->has('discount_data') ? session()->get('discount_data')['offer_code'] : '' }}";
+        var discount = "{{ session()->has('discount_data') ? session()->get('discount_data')['offer_amount'] : 0 }}";
+        var sub_total = "{{ $plan->price }}";
+    </script>
+    <script src="{{ url(env('ASSETPATHURL') . 'admin-assets/js/plan_payment.js') }}"></script>
+@endsection

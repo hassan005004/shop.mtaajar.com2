@@ -292,12 +292,6 @@ class WebSettingsController extends Controller
         $settingdata->email = $request->landing_email;
         $settingdata->contact = $request->landing_mobile;
         $settingdata->address = $request->landing_address;
-        if (Auth::user()->type  == 1) {
-            $settingdata->whatsapp_number = $request->contact;
-
-            $settingdata->whatsapp_chat_on_off =  isset($request->whatsapp_chat_on_off) ? 1 : 2;
-            $settingdata->whatsapp_chat_position = $request->whatsapp_chat_position;
-        }
         $settingdata->save();
         return redirect()->back()->with('success', trans('messages.success'));
     }
@@ -334,26 +328,6 @@ class WebSettingsController extends Controller
                     $request->landing_home_banner->move(storage_path('app/public/admin-assets/images/banners/'), $bannerimage);
                     $landingsettings->landing_home_banner = $bannerimage;
                 }
-                
-                if ($request->hasfile('testimonial_image')) {
-
-                    $validator = Validator::make($request->all(), [
-                        'testimonial_image' => 'image|max:' . helper::imagesize() . '|' . helper::imageext(),
-                    ], [
-                        "testimonial_image.image" => trans('messages.enter_image_file'),
-                    ]);
-                    if ($validator->fails()) {
-                        return redirect()->back()->with('error', trans('messages.image_size_message') . ' ' . helper::appdata('')->image_size . ' ' . 'MB');
-                    }
-
-                    if (file_exists(storage_path('app/public/admin-assets/images/testimonials/' . $landingsettings->testimonial_image))) {
-                        @unlink(storage_path('app/public/admin-assets/images/testimonials/' . $landingsettings->testimonial_image));
-                    }
-                    $bannerimage = 'testimonial-' . uniqid() . '.' . $request->testimonial_image->getClientOriginalExtension();
-                    $request->testimonial_image->move(storage_path('app/public/admin-assets/images/testimonials/'), $bannerimage);
-                    $landingsettings->testimonial_image = $bannerimage;
-                }
-
                 if ($request->hasfile('subscribe_image')) {
 
                     $validator = Validator::make($request->all(), [
@@ -603,7 +577,6 @@ class WebSettingsController extends Controller
                     $settingdata->referral_image = $referral;
                 }
                 $settingdata->product_ratting_switch = isset($request->product_ratting_switch) ? 1 : 2;
-                $settingdata->subscribe_newsletter = isset($request->subscribe_newsletter) ? 1 : 2;
                 $settingdata->online_order = isset($request->online_order_switch) ? 1 : 2;
                 if (isset($request->online_order_switch)) {
                     if ($settingdata->delivery_type == "" && $settingdata->delivery_type == null) {

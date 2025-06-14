@@ -151,7 +151,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group add-extra-class {{session()->get('direction') == 2 ? 'rtl' : ''}}">
-                                    <label class="form-label">{{ trans('labels.users') }}</label>
+                                    <label class="form-label">{{ trans('labels.vendors') }}</label>
                                     <select class="form-control selectpicker" name="vendors[]" multiple
                                         data-live-search="true">
                                         @if (!empty($vendors))

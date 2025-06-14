@@ -7,7 +7,7 @@
 
             <ol class="breadcrumb m-0">
 
-                <li class="breadcrumb-item"><a href="{{ URL::to('admin/users') }}">{{ trans('labels.users') }}</a>
+                <li class="breadcrumb-item"><a href="{{ URL::to('admin/users') }}">{{ trans('labels.vendors') }}</a>
 
                 </li>
 
@@ -19,14 +19,14 @@
         </nav>
 
     </div>
-    
+
     <div class="card border-0 box-shadow">
         <div class="card-body">
             <form action="{{ URL::to('admin/users/update-' . $getuserdata->slug) }}" method="post"
                 enctype="multipart/form-data">
                 @csrf
                 <div class="row">
-                @if (@helper::checkaddons('digital_product'))
+                    @if (@helper::checkaddons('digital_product'))
                         <div class="form-group col-md-6">
                             <label for="store" class="form-label">{{ trans('labels.store_categories') }}<span
                                     class="text-danger">
@@ -77,8 +77,8 @@
                         <input type="hidden" value="{{ $getuserdata->id }}" name="id">
                         <label class="form-label">{{ trans('labels.name') }}<span class="text-danger"> *
                             </span></label>
-                        <input type="text" class="form-control" name="name" id="name" value="{{ $getuserdata->name }}"
-                            placeholder="{{ trans('labels.name') }}" required>
+                        <input type="text" class="form-control" name="name" id="name"
+                            value="{{ $getuserdata->name }}" placeholder="{{ trans('labels.name') }}" required>
                         @error('name')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -98,8 +98,7 @@
                             <label class="form-label">{{ trans('labels.mobile') }}<span class="text-danger"> *
                                 </span></label>
                             <input type="text" class="form-control mobile-number" name="mobile"
-                                value="{{ $getuserdata->mobile }}" placeholder="{{ trans('labels.mobile') }}"
-                                required>
+                                value="{{ $getuserdata->mobile }}" placeholder="{{ trans('labels.mobile') }}" required>
                             @error('mobile')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -108,15 +107,15 @@
                     <div class="form-group col-sm-6">
                         <label class="form-label">{{ trans('labels.image') }}</label>
                         <input type="file" class="form-control" name="profile">
-                        <img class="rounded-circle mt-2" src="{{ helper::image_path($getuserdata->image) }}"
-                            alt="" width="70" height="70">
+                        <img class="rounded-circle mt-2" src="{{ helper::image_path($getuserdata->image) }}" alt=""
+                            width="70" height="70">
                         @error('profile')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="country" class="form-label">{{ trans('labels.country') }}<span
-                                class="text-danger"> * </span></label>
+                        <label for="country" class="form-label">{{ trans('labels.country') }}<span class="text-danger"> *
+                            </span></label>
                         <select name="country" class="form-select" id="country" required>
                             <option value="">{{ trans('labels.select') }}</option>
                             @foreach ($countries as $country)
@@ -144,14 +143,15 @@
                             @endif
                             <div class="input-group ">
                                 <span
-                                    class="input-group-text col-5 col-lg-auto overflow-x-auto {{session()->get('direction') == 2 ? 'rounded-start-0 rounded-end' : ''}}">{{ URL::to('/') }}/</span>
-                                <input type="text" class="form-control {{session()->get('direction') == 2 ? 'rounded-end-0 rounded-start' : ''}}" id="slug" name="slug"
-                                    value="{{ $getuserdata->slug }}" required>
+                                    class="input-group-text col-5 col-lg-auto overflow-x-auto {{ session()->get('direction') == 2 ? 'rounded-start-0 rounded-end' : '' }}">{{ URL::to('/') }}/</span>
+                                <input type="text"
+                                    class="form-control {{ session()->get('direction') == 2 ? 'rounded-end-0 rounded-start' : '' }}"
+                                    id="slug" name="slug" value="{{ $getuserdata->slug }}" required>
                             </div>
                         </div>
                     @endif
                     <div class="col-sm-6">
-                    @if (@helper::checkaddons('allow_without_subscription'))
+                        @if (@helper::checkaddons('allow_without_subscription'))
                             <div class="form-group" id="plan">
                                 <div class="d-flex">
                                     <input class="form-check-input mx-1" type="checkbox" name="plan_checkbox"
@@ -165,11 +165,12 @@
                                     <span class="fw-500"> {{ !empty($plan) ? $plan->name : '-' }}</span>)
 
                                 </div>
-                               
+
                                 <select name="plan" id="selectplan" class="form-select" disabled required>
                                     <option value="">{{ trans('labels.select') }}</option>
                                     @foreach ($getplanlist as $plans)
-                                        <option value="{{ $plans->id }}" {{ $plans->id == @$plan->id ? 'selected' : ''}}>
+                                        <option value="{{ $plans->id }}"
+                                            {{ $plans->id == @$plan->id ? 'selected' : '' }}>
                                             {{ $plans->name }}
                                         </option>
                                     @endforeach
@@ -178,8 +179,8 @@
                             </div>
                             <div class="form-group">
                                 <input class="form-check-input mx-1" type="checkbox" name="allow_store_subscription"
-                                    id="allow_store_subscription"
-                                    @if ($getuserdata->allow_without_subscription == '1') checked @endif><label class="form-check-label"
+                                    id="allow_store_subscription" @if ($getuserdata->allow_without_subscription == '1') checked @endif><label
+                                    class="form-check-label"
                                     for="allow_store_subscription">{{ trans('labels.allow_store_without_subscription') }}</label>
 
                             </div>
@@ -192,19 +193,17 @@
 
                         </div>
                     </div>
-                    <div class="form-group {{session()->get('direction') == 2 ? 'text-start' : 'text-end'}}">
+                    <div class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                         <a href="{{ URL::to('admin/users') }}"
                             class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
                         <button
                             @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
-                            class="btn btn-primary px-sm-4">{{ trans('labels.save') }}</button>
+                            class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-    {{-- <div class="row">
-    </div> --}}
 @endsection
 @section('scripts')
     <script>

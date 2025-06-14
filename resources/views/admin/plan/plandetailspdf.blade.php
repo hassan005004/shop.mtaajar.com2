@@ -1,51 +1,66 @@
 <html>
+
 <head>
-    <title>{{ helper::appdata(Auth::user()->id)->web_title }}</title>
+    <title>{{ helper::appdata(1)->web_title }}</title>
 </head>
 <style type="text/css">
     body {
         font-family: 'Roboto Condensed', sans-serif;
     }
+
     .m-0 {
         margin: 0px;
     }
+
     .p-0 {
         padding: 0px;
     }
+
     .pt-5 {
         padding-top: 5px;
     }
+
     .mt-10 {
         margin-top: 10px;
     }
+
     .text-center {
         text-align: center !important;
     }
+
     .w-100 {
         width: 100%;
     }
+
     .w-50 {
         width: 50%;
     }
+
     .w-85 {
         width: 85%;
     }
+
     .w-15 {
         width: 15%;
     }
+
     .logo img {
         width: 200px;
         height: 60px;
     }
+
     .gray-color {
         color: #5D5D5D;
     }
+
     .text-bold {
         font-weight: bold;
     }
+
     .border {
         border: 1px solid black;
     }
+
     table tr,
     th,
     td {
@@ -53,33 +68,42 @@
         border-collapse: collapse;
         padding: 7px 8px;
     }
+
     table tr th {
         background: #F4F4F4;
         font-size: 15px;
     }
+
     table tr td {
         font-size: 13px;
     }
+
     table {
         border-collapse: collapse;
     }
+
     .box-text p {
         line-height: 10px;
     }
+
     .float-left {
         float: left;
     }
+
     .total-part {
         font-size: 16px;
         line-height: 12px;
     }
+
     .total-right p {
         padding-right: 20px;
     }
+
     .mt-15 {
         margin-top: 15px;
     }
 </style>
+
 <body>
     <div class="head-title">
         <h1 class="text-center m-0 p-0">{{ trans('labels.transaction_invoice') }}</h1>
@@ -96,9 +120,9 @@
             <p class="m-0 pt-5 text-bold w-100">{{ trans('labels.transaction_number') }} : <span
                     class="gray-color">#{{ $plan->transaction_number }}</span></p>
             <p class="m-0 pt-5 text-bold w-100">{{ trans('labels.purchase_date') }} : <span
-                    class="gray-color">{{ helper::date_formate($plan->created_at,$vendor_id) }}</span></p>
+                    class="gray-color">{{ helper::date_formate($plan->created_at, $vendor_id) }}</span></p>
             <p class="m-0 pt-5 text-bold w-100">{{ trans('labels.expire_date') }} : <span
-                    class="gray-color">{{ helper::date_formate($plan->expire_date,$vendor_id) }}</span></p>
+                    class="gray-color">{{ helper::date_formate($plan->expire_date, $vendor_id) }}</span></p>
         </div>
         <div style="clear: both;"></div>
     </div>
@@ -133,10 +157,10 @@
                         @endif
                     @endif
                     @if ($plan->offer_amount != '' && $plan->offer_amount != null)
-                        <p>{{trans('labels.discount')}} : -{{ helper::currency_formate($plan->offer_amount, '') }}
+                        <p>{{ trans('labels.discount') }} : -{{ helper::currency_formate($plan->offer_amount, '') }}
                         </p>
                     @endif
-                    <p>{{trans('labels.total')}} {{trans('labels.amount')}} :
+                    <p>{{ trans('labels.total') }} {{ trans('labels.amount') }} :
                         {{ helper::currency_formate($plan->grand_total, '') }}</p>
                     <div class="box-text">
                         <p>Payment type</p>
@@ -150,9 +174,9 @@
                         @elseif($plan->payment_type == 6)
                             {{ @helper::getpayment($plan->payment_type, 1)->payment_name }}
                         @elseif($plan->payment_type == 0)
-                            {{trans('labels.manual')}}
+                            {{ trans('labels.manual') }}
                         @elseif($plan->payment_type == 1)
-                        {{trans('labels.cod')}}
+                            {{ trans('labels.cod') }}
                         @endif
                     </div>
                 </td>
@@ -299,4 +323,5 @@
         <span>{{ helper::appdata('')->copyright }}</span>
     </div>
 </body>
+
 </html>

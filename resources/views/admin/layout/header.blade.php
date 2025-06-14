@@ -1,12 +1,10 @@
 @php
-    if(Auth::user()->type ==4)
-    {
+    if (Auth::user()->type == 4) {
         $vendor_id = Auth::user()->vendor_id;
-
-    }else{
+    } else {
         $vendor_id = Auth::user()->id;
     }
-    $user = App\Models\User::where('id',$vendor_id)->first();
+    $user = App\Models\User::where('id', $vendor_id)->first();
 @endphp
 <header class="page-topbar">
     <div class="navbar-header">
@@ -17,35 +15,39 @@
         <div class="d-flex align-items-center gap-2">
             @if (session('vendor_login'))
                 <a href="{{ URL::to('/admin/admin_back') }}"
-                    class="btn btn-primary icon_box btn-hover btn-sm tooltip-bottom"><i
-                    class="fa-regular fa-user"></i></a>
+                    class="btn btn-primary icon_box btn-hover btn-sm tooltip-bottom">
+                    <i class="fa-regular fa-user"></i>
+                </a>
             @endif
-            @if (Auth::user()->type == 2 || Auth::user()->type == 4)
-            <a class="btn btn-secondary icon_box btn-sm mx-1" href="@if(helper::checkcustomdomain($vendor_id) == null) {{ URL::to('/' . $user->slug) }} @else {{ '//' . helper::checkcustomdomain($vendor_id) }} @endif"
-                target="_blank"><i class="fa-solid fa-link"></i>
-            </a>
+            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                <a class="btn btn-secondary icon_box btn-sm mx-1"
+                    href="@if (helper::checkcustomdomain($vendor_id) == null) {{ URL::to('/' . $user->slug) }} @else {{ '//' . helper::checkcustomdomain($vendor_id) }} @endif"
+                    target="_blank"><i class="fa-solid fa-link"></i>
+                </a>
             @endif
             <!-- dekstop-tablet-mobile-language-dropdown-button-start-->
             @if (@helper::checkaddons('language'))
-                 <div class="position-relative">
-                        <div class="dropdown">
-                            <a class="btn btn-sm btn-primary icon_box btn-hover dropdown-toggle" href="#"
-                                role="button" data-bs-toggle ="dropdown" aria-expanded="false">
-                                <i class="fa-regular fa-globe"></i>
-                            </a>
-                            <ul class="dropdown-menu drop-menu {{ session()->get('direction') == 2 ? 'drop-menu-rtl' : 'drop-menu' }}">
-                                @foreach (helper::available_language('') as $languagelist)
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center px-3 py-2"  href="{{ URL::to('/lang/change?lang=' . $languagelist->code) }}">
-                                            <img src="{{ helper::image_path($languagelist->image) }}" alt=""
-                                                class="img-fluid lag-img" width="25px">
-                                            <span class="px-2">{{ $languagelist->name }}</span>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                <div class="position-relative">
+                    <div class="dropdown lag-btn">
+                        <a class="btn btn-sm btn-primary icon_box btn-hover dropdown-toggle" href="#"
+                            role="button" data-bs-toggle ="dropdown" aria-expanded="false">
+                            <i class="fa-regular fa-globe"></i>
+                        </a>
+                        <ul
+                            class="dropdown-menu drop-menu border-0 p-0 bg-body-secondary shadow overflow-hidden {{ session()->get('direction') == 2 ? 'drop-menu-rtl' : 'drop-menu' }}">
+                            @foreach (helper::available_language('') as $languagelist)
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center px-3 py-2"
+                                        href="{{ URL::to('/lang/change?lang=' . $languagelist->code) }}">
+                                        <img src="{{ helper::image_path($languagelist->image) }}" alt=""
+                                            class="img-fluid lag-img" width="25px">
+                                        <span class="px-2">{{ $languagelist->name }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
+                </div>
             @endif
             <!-- dekstop-tablet-mobile-language-dropdown-button-end-->
             <div class="dropwdown d-inline-block">
@@ -59,13 +61,14 @@
                         class="dropdown-item d-flex align-items-center">
                         <i class="fa-light fa-address-card fs-5 mx-2"></i>{{ trans('labels.edit_profile') }}
                     </a>
-                    <a href="{{ URL::to('admin/settings') }}#changepasssword" class="dropdown-item d-flex align-items-center">
-                       
+                    <a href="{{ URL::to('admin/settings') }}#changepasssword"
+                        class="dropdown-item d-flex align-items-center">
+
                         <i class="fa-light fa-lock-keyhole fs-5 mx-2"></i>{{ trans('labels.change_password') }}
 
                     </a>
-                
-                    <a href="javascript:void(0)" onclick="statusupdate('{{ URL::to('/admin/logout')}}')"
+
+                    <a href="javascript:void(0)" onclick="statusupdate('{{ URL::to('/admin/logout') }}')"
                         class="dropdown-item d-flex align-items-center">
                         <i class="fa-light fa-right-from-bracket fs-5 mx-2"></i>{{ trans('labels.logout') }}
                     </a>

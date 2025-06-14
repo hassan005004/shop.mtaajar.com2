@@ -20,19 +20,23 @@
     </div>
     <div class="row">
         <div class="col-md-12 my-2 d-flex justify-content-end gap-2">
-            @if (helper::appdata($vendor_id)->product_type == 1)
-                @if (helper::appdata($vendor_id)->ship_rocket_on_off == 1)
-                <a href="{{ URL::to('admin/orders/create_order-' . $vendor_id. '-' . $getorderdata->id) }}" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> {{ trans('labels.create_order_in_shiprocket') }} </a>
-                @endif
-                @if ($getorderdata->status_type == 1 || $getorderdata->status_type == 2)
-                    <button type="button" class="btn btn-sm btn-danger dropdown-toggle"
-                        data-bs-toggle="dropdown">{{ @helper::gettype($getorderdata->status, $getorderdata->status_type, $getorderdata->order_type, $getorderdata->vendor_id)->name }}</button>
-                    <div class="dropdown-menu dropdown-menu-right {{ Auth::user()->type == 1 ? 'disabled' : '' }}">
-                        @foreach (helper::customstauts($getorderdata->vendor_id, $getorderdata->order_type) as $status)
-                            <a class="dropdown-item w-auto @if ($getorderdata->status == '1') fw-600 @endif"
-                                onclick="statusupdate('{{ URL::to('admin/orders/update-' . $getorderdata->id . '-' . $status->id . '-' . $status->type) }}')">{{ $status->name }}</a>
-                        @endforeach
-                    </div>
+            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                @if ($getorderdata->order_type == 1)
+                    @if (helper::appdata($vendor_id)->ship_rocket_on_off == 1)
+                        <a href="{{ URL::to('admin/orders/create_order-' . $vendor_id . '-' . $getorderdata->id) }}"
+                            class="btn btn-primary"><i class="fa-solid fa-rocket"></i>
+                            {{ trans('labels.create_order_in_shiprocket') }} </a>
+                    @endif
+                    @if ($getorderdata->status_type == 1 || $getorderdata->status_type == 2)
+                        <button type="button" class="btn btn-sm btn-danger dropdown-toggle"
+                            data-bs-toggle="dropdown">{{ @helper::gettype($getorderdata->status, $getorderdata->status_type, $getorderdata->order_type, $getorderdata->vendor_id)->name }}</button>
+                        <div class="dropdown-menu dropdown-menu-right {{ Auth::user()->type == 1 ? 'disabled' : '' }}">
+                            @foreach (helper::customstauts($getorderdata->vendor_id, $getorderdata->order_type) as $status)
+                                <a class="dropdown-item w-auto cursor-pointer @if ($getorderdata->status == $status->id) fw-600 @endif"
+                                    onclick="statusupdate('{{ URL::to('admin/orders/update-' . $getorderdata->id . '-' . $status->id . '-' . $status->type) }}')">{{ $status->name }}</a>
+                            @endforeach
+                        </div>
+                    @endif
                 @endif
             @endif
         </div>
@@ -42,7 +46,7 @@
         <div class="col-md-12">
             <div class="row justify-content-between g-3">
                 <div
-                    class="{{ helper::appdata($vendor_id)->product_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
+                    class="{{ $getorderdata->order_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
                     <div class="card border-0 mb-3 h-100 d-flex shadow">
                         <div
                             class="card-header d-flex align-items-center bg-transparent text-dark py-3 justify-content-between">
@@ -74,7 +78,8 @@
                                                 {{ trans('labels.online') }}
                                             @elseif ($getorderdata->transaction_type == 6)
                                                 {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
-                                                : <small><a href="{{ helper::image_path($getorderdata->screenshot) }}"
+                                                : <small>
+                                                    <a href="{{ helper::image_path($getorderdata->screenshot) }}"
                                                         target="_blank"
                                                         class="text-danger">{{ trans('labels.click_here') }}</a></small>
                                             @else
@@ -82,6 +87,15 @@
                                             @endif
                                         </span>
                                     </li>
+                                    @if ($getorderdata->tips > 0)
+                                        <li
+                                            class="list-group-item px-0 fs-7 fw-500 d-flex justify-content-between align-items-center">
+                                            {{ trans('labels.tips_pro') }}
+                                            <p class="text-muted">
+                                                {{ helper::currency_formate($getorderdata->tips, $getorderdata->vendor_id) }}
+                                            </p>
+                                        </li>
+                                    @endif
                                     @if (in_array($getorderdata->transaction_type, [2, 3, 4, 5, 7, 8, 9, 10]))
                                         <li class="list-group-item px-0">{{ trans('labels.payment_id') }}
                                             <p class="text-muted">
@@ -102,17 +116,19 @@
                     </div>
                 </div>
                 <div
-                    class="{{ helper::appdata($vendor_id)->product_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
+                    class="{{ $getorderdata->order_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
                     <div class="card border-0 mb-3 h-100 d-flex shadow">
                         <div
                             class="card-header d-flex align-items-center bg-transparent text-dark py-3 justify-content-between">
                             <h6 class="px-2 fw-500 text-dark"><i class="fa-solid fa-user fs-5"></i>
                                 {{ trans('labels.customer_info') }}
                             </h6>
-                            <p class="text-muted cursor-pointer"
-                                onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','customer_info')">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </p>
+                            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                                <p class="text-muted cursor-pointer"
+                                    onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','customer_info')">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </p>
+                            @endif
                         </div>
                         <div class="card-body">
                             <div class="basic-list-group">
@@ -149,7 +165,7 @@
                         </div>
                     </div>
                 </div>
-                @if (helper::appdata($vendor_id)->product_type == 1)
+                @if ($getorderdata->order_type == 1)
                     <div class="col-md-3 col-lg-3 col-xl-3">
                         <div class="card border-0 mb-3 h-100 d-flex shadow">
 
@@ -158,11 +174,13 @@
                                 <h6 class="px-2 fw-500 text-dark"><i class="fa-solid fa-file-invoice fs-5"></i>
                                     {{ $getorderdata->order_from == 'pos' ? trans('labels.info') : trans('labels.bill_to') }}
                                 </h6>
-                                @if ($getorderdata->order_from != 'pos')
-                                    <p class="text-muted cursor-pointer"
-                                        onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','bill_info')">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </p>
+                                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                                    @if ($getorderdata->order_from != 'pos')
+                                        <p class="text-muted cursor-pointer"
+                                            onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','bill_info')">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </p>
+                                    @endif
                                 @endif
                             </div>
                             <div class="card-body">
@@ -215,27 +233,6 @@
                                                 </ul>
                                             </div>
                                         </div>
-
-                                        {{-- <div class="col-md-12 mb-2">
-                                            <div class="basic-list-group">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item px-0 fs-7 fw-500 d-flex justify-content-between align-items-center align-items-center">
-                                                        <p>{{ trans('labels.pos') }}</p>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                   
-                                        <div class="col-md-12 mb-2">
-                                            <div class="basic-list-group">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item px-0 fs-7 fw-500 d-flex justify-content-between align-items-center align-items-center">
-                                                        <p>{{ trans('labels.digital') }}</p>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div> --}}
-
                                     </div>
                                 </div>
                             </div>
@@ -248,10 +245,12 @@
                                 <h6 class="px-2 fw-500 text-dark"><i class="fa-solid fa-file-invoice fs-5"></i>
                                     {{ trans('labels.shipping_to') }}
                                 </h6>
-                                <p class="text-muted cursor-pointer"
-                                    onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','shipping_info')">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </p>
+                                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                                    <p class="text-muted cursor-pointer"
+                                        onclick="editcustomerdata('{{ $getorderdata->order_number }}','{{ $getorderdata->user_name }}','{{ $getorderdata->user_mobile }}','{{ $getorderdata->user_email }}','{{ $getorderdata->billing_address }}','{{ $getorderdata->billing_landmark }}','{{ $getorderdata->billing_postal_code }}','{{ $getorderdata->billing_city }}','{{ $getorderdata->billing_state }}','{{ $getorderdata->billing_country }}','{{ $getorderdata->shipping_address }}','{{ $getorderdata->shipping_landmark }}','{{ $getorderdata->shipping_postal_code }}','{{ $getorderdata->shipping_city }}','{{ $getorderdata->shipping_state }}','{{ $getorderdata->shipping_country }}','shipping_info')">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </p>
+                                @endif
                             </div>
                             <div class="card-body">
                                 <div class="basic-list-group">
@@ -300,48 +299,50 @@
                         </div>
                     </div>
                 @endif
-                <div
-                    class="{{ helper::appdata($vendor_id)->product_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
-                    <div class="card border-0 mb-3 h-100 d-flex shadow">
-                        <div
-                            class="card-header d-flex align-items-center bg-transparent text-dark py-3 justify-content-between">
-                            <h6 class="px-2 fw-500 text-dark"><i class="fa-solid fa-clipboard fs-5"></i>
-                                {{ trans('labels.notes') }}</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="basic-list-group">
-                                <div class="row">
-                                    <div class="basic-list-group">
-                                        @if ($getorderdata->vendor_note != '')
-                                            <div class="alert alert-info" role="alert">
-                                                {{ $getorderdata->vendor_note }}
-                                            </div>
-                                        @endif
+                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                    <div
+                        class="{{ $getorderdata->order_type == 1 ? 'col-md-3 col-lg-3 col-xl-3' : 'col-md-4 col-lg-4 col-xl-4' }}">
+                        <div class="card border-0 mb-3 h-100 d-flex shadow">
+                            <div
+                                class="card-header d-flex align-items-center bg-transparent text-dark py-3 justify-content-between">
+                                <h6 class="px-2 fw-500 text-dark"><i class="fa-solid fa-clipboard fs-5"></i>
+                                    {{ trans('labels.notes') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="basic-list-group">
+                                    <div class="row">
+                                        <div class="basic-list-group">
+                                            @if ($getorderdata->vendor_note != '')
+                                                <div class="alert alert-info" role="alert">
+                                                    {{ $getorderdata->vendor_note }}
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer bg-white">
-                            <form action="{{ URL::to('admin/orders/vendor_note') }}" method="POST">
-                                @csrf
-                                <div class="form-group col-md-12">
-                                    <label for="note"> {{ trans('labels.note') }} </label>
-                                    <div class="controls">
-                                        <input type="hidden" name="order_id" class="form-control"
-                                            value="{{ $getorderdata->order_number }}">
-                                        <input type="text" name="vendor_note" class="form-control" required>
+                            <div class="card-footer bg-white">
+                                <form action="{{ URL::to('admin/orders/vendor_note') }}" method="POST">
+                                    @csrf
+                                    <div class="form-group col-md-12">
+                                        <label for="note"> {{ trans('labels.note') }} </label>
+                                        <div class="controls">
+                                            <input type="hidden" name="order_id" class="form-control"
+                                                value="{{ $getorderdata->order_number }}">
+                                            <input type="text" name="vendor_note" class="form-control" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div
-                                    class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                    <button
-                                        @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" type="submit" @endif
-                                        class="btn btn-primary"> {{ trans('labels.update') }} </button>
-                                </div>
-                            </form>
+                                    <div
+                                        class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
+                                        <button
+                                            @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" type="submit" @endif
+                                            class="btn btn-primary"> {{ trans('labels.update') }} </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
 
@@ -355,10 +356,12 @@
                         <i class="fa-solid fa-bag-shopping fs-5"></i>
                         <h6 class="fw-500 text-dark">{{ trans('labels.orders') }}</h6>
                     </div>
-                    <a href="{{ URL::to('admin/orders/print/' . $getorderdata->order_number) }}"
-                        class="btn btn-secondary px-sm-4 fs-15">
-                        <i class="fa fa-pdf" aria-hidden="true"></i> {{ trans('labels.print') }}
-                    </a>
+                    @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                        <a href="{{ URL::to('admin/orders/print/' . $getorderdata->order_number) }}"
+                            class="btn btn-secondary px-sm-4 fs-15">
+                            {{ trans('labels.print') }}
+                        </a>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -390,12 +393,12 @@
                                                 </small>
                                             @endif
                                             @if ($orders->extras_id != '')
-                                                <?php
-                                                $extras_id = explode('|', $orders->extras_id);
-                                                $extras_name = explode('|', $orders->extras_name);
-                                                $extras_price = explode('|', $orders->extras_price);
-                                                $extras_total_price = 0;
-                                                ?>
+                                                @php
+                                                    $extras_id = explode('|', $orders->extras_id);
+                                                    $extras_name = explode('|', $orders->extras_name);
+                                                    $extras_price = explode('|', $orders->extras_price);
+                                                    $extras_total_price = 0;
+                                                @endphp
                                                 <br>
                                                 @foreach ($extras_id as $key => $addons)
                                                     <small>
@@ -473,20 +476,25 @@
                                     @endforeach
                                 @endif
                                 @if ($getorderdata->order_type == 1)
-                                    @if ($getorderdata->delivery_charge != null && $getorderdata->delivery_charge != '')
-                                        <tr class="fs-15 align-middle">
-                                            <td class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}"
-                                                colspan="3">
-                                                <p class="m-0 fw-500">{{ trans('labels.delivery_charge') }}({{ $getorderdata->shipping_area }})</p>
-                                            </td>
-                                            <td
-                                                class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                                <p class="m-0 fw-500">
+                                    <tr class="fs-15 align-middle">
+                                        <td class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}"
+                                            colspan="3">
+                                            <p class="m-0 fw-500">{{ trans('labels.delivery') }}
+                                                @if ($getorderdata->shipping_area != '')
+                                                    ({{ $getorderdata->shipping_area }})
+                                                @endif
+                                            </p>
+                                        </td>
+                                        <td class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
+                                            <p class="m-0 fw-500">
+                                                @if ($getorderdata->delivery_charge > 0)
                                                     {{ helper::currency_formate($getorderdata->delivery_charge, $getorderdata->vendor_id) }}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    @endif
+                                                @else
+                                                    {{ trans('labels.free') }}
+                                                @endif
+                                            </p>
+                                        </td>
+                                    </tr>
                                 @endif
                                 <tr class="fs-16 align-middle">
                                     <td class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }} text-dark"

@@ -305,9 +305,9 @@ class UserController extends Controller
                 if ($check_send_mail == 1) {
                     $checkuser->password = Hash::make($password);
                     $checkuser->save();
-                    return redirect(URL::to($vendordata->slug . '/login'))->with('success', trans('messages.success'));
+                    return redirect('/' . $request->vendor_slug . '/login')->with('success', trans('messages.success'));
                 } else {
-                    return redirect(URL::to($vendordata->slug . '/forgotpassword'))->with('error', trans('messages.wrong'));
+                    return redirect('/' . $request->vendor_slug . '/forgotpassword')->with('error', trans('messages.wrong'));
                 }
             } else {
                 return redirect()->back()->with('error', trans('messages.invalid_user'));
@@ -501,9 +501,9 @@ class UserController extends Controller
             abort(404);
         }
         $getfavourite = Products::with('product_image', 'multi_variation', 'category_info')->select('products.id', 'products.category_id', 'products.sub_category_id', 'products.name', 'products.slug', 'products.has_variation', 'products.attribute', 'products.price', 'products.original_price', 'products.tax', 'products.description', 'products.is_available', 'products.is_deleted', 'products.created_at', 'products.updated_at', DB::raw('ROUND(AVG(testimonials.star),1) as ratings_average'))->leftjoin('favorite', 'favorite.product_id', '=', 'products.id')->leftJoin('testimonials', 'testimonials.product_id', '=', 'products.id')->groupBy('products.id')->where('favorite.vendor_id', $vdata)->where('products.vendor_id', $vdata)
-            ->where('favorite.user_id', Auth::user()->id)->where('products.top_deals', '!=', '1')->orderBy('products.reorder_id')
+            ->where('favorite.user_id', Auth::user()->id)->orderBy('products.reorder_id')
             ->where('products.is_available', 1)->where('products.is_deleted', 2)->where('products.vendor_id', $vdata)->paginate(9);
-        return view('web.user.favourite', compact('vendordata', 'getfavourite'));
+        return view('web.user.favourite', compact('vendordata', 'vdata', 'getfavourite'));
     }
     public function referearn(Request $request)
     {

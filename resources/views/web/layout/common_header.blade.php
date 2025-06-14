@@ -1,5 +1,5 @@
 <!-- top bar section start -->
-<section class="top-bar bg-dark py-2 d-md-block d-none">
+<section class="top-bar header-bar bg-dark py-2 d-md-block d-none">
     <div class="container">
         <div class="d-flex align-items-center justify-content-between">
             <div class="top-bar-call-email d-none d-md-block text-white">
@@ -33,14 +33,14 @@
                                     <img src="{{ helper::image_path(session()->get('flag')) }}"
                                         class="lag-img img-fluid mx-1" alt="">
                                 </button>
-                                <ul class="dropdown-menu rounded-1 p-0 rounded-3 overflow-hidden">
+                                <ul class="dropdown-menu rounded-1 p-0 border-0 overflow-hidden bg-body-secondary shadow {{ session()->get('direction') == '2' ? 'min-dropdown-rtl' : 'min-dropdown-ltr' }}">
                                     @foreach (helper::available_language(@$vendordata->id) as $languagelist)
                                         @if (in_array($languagelist->code, explode('|', helper::appdata(@$vendordata->id)->languages)))
-                                            <li><a class="dropdown-item text-dark d-flex align-items-center text-left px-3 py-2"
+                                            <li><a class="dropdown-item text-dark d-flex gap-2 align-items-center text-left px-2 py-2"
                                                     href="{{ URL::to('/lang/change?lang=' . $languagelist->code) }}">
                                                     <img src="{{ helper::image_path($languagelist->image) }}"
-                                                        alt="" class="img-fluid lag-img mx-1 w-25">
-                                                    &nbsp;&nbsp;{{ $languagelist->name }}
+                                                        alt="" class="img-fluid lag-img w-25">
+                                                    {{ $languagelist->name }}
                                                 </a>
                                             </li>
                                         @endif
@@ -122,8 +122,13 @@
 
             <div class="col-xl-2 col-lg-2 col-md-4 col-7">
 
-                <div class="logo-wrapper navbar-brand py-2">
-
+                <div class="logo-wrapper navbar-brand py-2 d-flex gap-2 align-items-center">
+                    <div class="d-lg-none">
+                        <button class="btn bg-transparent btn-group border-0 text-dark m-0" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#footersiderbar" aria-controls="footersiderbar">
+                            <i class="fa-solid fa-bars fs-3"></i>
+                        </button>
+                    </div>
                     <a href="{{ URL::to(@$vendordata->slug . '/') }}">
 
                         <img src="{{ helper::image_path(@helper::appdata(@$vendordata->id)->logo) }}"
@@ -210,27 +215,22 @@
                                                 <img src="{{ helper::image_path(session()->get('flag')) }}"
                                                     class="lag-img-mobile img-fluid" alt="">
                                             </button>
-                                            <ul class="dropdown-menu rounded-1 p-0 rounded-3 overflow-hidden">
+                                            <ul class="dropdown-menu bg-body-secondary shadow border-0 rounded-1 p-0 rounded-3 overflow-hidden">
                                                 @foreach (helper::available_language(@$vendordata->id) as $languagelist)
                                                     @if (in_array($languagelist->code, explode('|', helper::appdata(@$vendordata->id)->languages)))
-                                                        <li><a class="dropdown-item text-dark d-flex align-items-center text-left px-0 py-2"
+                                                        <li class="m-0"><a
+                                                                class="dropdown-item text-dark gap-2 d-flex align-items-center text-left p-2"
                                                                 href="{{ URL::to('/lang/change?lang=' . $languagelist->code) }}">
                                                                 <img src="{{ helper::image_path($languagelist->image) }}"
                                                                     alt=""
-                                                                    class="img-fluid lag-img-mobile mx-1 w-25">
-                                                                &nbsp;&nbsp;{{ $languagelist->name }}
+                                                                    class="img-fluid lag-img-mobile w-25">
+                                                                {{ $languagelist->name }}
                                                             </a>
                                                         </li>
                                                     @endif
                                                 @endforeach
                                             </ul>
                                         </div>
-
-                                        <button class="btn bg-transparent btn-group border text-dark m-0"
-                                            type="button" data-bs-toggle="offcanvas"
-                                            data-bs-target="#footersiderbar" aria-controls="footersiderbar">
-                                            <i class="fa-solid fa-bars"></i>
-                                        </button>
                                     </div>
                                 </div>
                             @endif
@@ -340,41 +340,13 @@
                     {{ trans('labels.shop_all') }}
                 </a>
             </li>
-            @if (@helper::checkaddons('subscription'))
-                @if (@helper::checkaddons('blog'))
-                    @php
-                        $checkplan = App\Models\Transaction::where('vendor_id', @$vdata)
-                            ->orderByDesc('id')
-                            ->first();
-                        $user = App\Models\User::where('id', @$vdata)->first();
-                        if (@$user->allow_without_subscription == 1) {
-                            $blogs = 1;
-                        } else {
-                            $blogs = @$checkplan->blogs;
-                        }
-                    @endphp
-                    @if ($blogs == 1)
-                        <li class="list-group-item px-0 py-3 {{ session()->get('direction') == 2 ? 'pe-3' : 'ps-3' }}">
-                            <a class="fs-7 fw-500 d-flex gap-2 align-items-center"
-                                href="{{ URL::to(@$vendordata->slug . '/blogs') }}">
-                                <i class="fa-solid fa-circle-dot fs-7"></i>
-                                {{ trans('labels.blog') }}
-                            </a>
-                        </li>
-                    @endif
-                @endif
-            @else
-                @if (@helper::checkaddons('blog'))
-                    <li class="list-group-item px-0 py-3 {{ session()->get('direction') == 2 ? 'pe-3' : 'ps-3' }}">
-                        <a class="fs-7 fw-500 d-flex gap-2 align-items-center"
-                            href="{{ URL::to(@$vendordata->slug . '/blogs') }}">
-                            <i class="fa-solid fa-circle-dot fs-7"></i>
-                            {{ trans('labels.blog') }}
-                        </a>
-                    </li>
-                @endif
-            @endif
-            
+            <li class="list-group-item px-0 py-3 {{ session()->get('direction') == 2 ? 'pe-3' : 'ps-3' }}">
+                <a class="fs-7 fw-500 d-flex gap-2 align-items-center"
+                    href="{{ URL::to(@$vendordata->slug . '/blogs') }}">
+                    <i class="fa-solid fa-circle-dot fs-7"></i>
+                    {{ trans('labels.blog') }}
+                </a>
+            </li>
             <li class="list-group-item px-0 py-3 {{ session()->get('direction') == 2 ? 'pe-3' : 'ps-3' }}">
                 <a class="fs-7 fw-500 d-flex gap-2 align-items-center"
                     href="{{ URL::to(@$vendordata->slug . '/gallery') }}">

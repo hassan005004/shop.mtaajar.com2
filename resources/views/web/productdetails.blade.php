@@ -119,7 +119,7 @@
                                 value="{{ $productdata->min_order }}">
                             <input type="hidden" name="item_max_order" id="item_max_order"
                                 value="{{ $productdata->max_order }}">
-                            <input type="hidden" name="item_price" id="item_price" value="{{ $price }}">
+                            <input type="hidden" name="item_price" id="overview_item_price" value="{{ $price }}">
                             <input type="hidden" name="item_original_price" id="overview_item_original_price"
                                 value ="{{ $original_price }}">
                             <input type="hidden" name="tax" id="tax_val" value="{{ $productdata->tax }}">
@@ -174,18 +174,26 @@
                                     $productdata->attchment_name != '')
                                 <div class="border-bottom pb-3 d-block ">
                                     <div class="bg-gray-light p-3 mt-3 rounded-0">
+                                        <p class="text-dark align-items-center d-flex gap-1">
+                                            <i class="fa-solid fa-circle fs-10"></i>
+                                            <span class="fs-7 fw-semibold">{{ trans('labels.category') }} :</span>
+                                            <span class="text-muted fs-7">{{ $productdata['category_info']->name }}</span>
+                                        </p>
                                         @if ($productdata->sku != '' && $productdata->sku != null)
                                             <div class="row">
-                                                <p class="text-dark">
-                                                    <span class="fs-7 fw-semibold">{{ trans('labels.sku') }}</span> :
+                                                <p class="text-dark align-items-center d-flex gap-1">
+                                                    <i class="fa-solid fa-circle fs-10"></i>
+                                                    <span class="fs-7 fw-semibold">{{ trans('labels.sku') }} :</span>
                                                     <span class="text-muted fs-7"
                                                         id="sku">{{ $productdata->sku }}</span>
                                                 </p>
                                             </div>
                                         @endif
                                         @if ($productdata->has_variation == 2 && $productdata->stock_management == 1)
-                                            <div class="sku-wrapper product_meta" id="stock">
-                                                <span class="fs-7 fw-semibold">{{ trans('labels.stock') }}:</span>
+                                            <div class="sku-wrapper product_meta align-items-center d-flex gap-1"
+                                                id="stock">
+                                                <i class="fa-solid fa-circle fs-10"></i>
+                                                <span class="fs-7 fw-semibold">{{ trans('labels.stock') }} :</span>
 
                                                 @if ($productdata->qty > 0)
                                                     <span class="text-success fs-7">{{ $productdata->qty }}
@@ -196,8 +204,10 @@
                                                 @endif
                                             </div>
                                         @elseif ($productdata->has_variation == 1)
-                                            <div class="sku-wrapper product_meta" id="stock">
-                                                <span class="fs-7 fw-semibold text-dark">{{ trans('labels.stock') }}:
+                                            <div class="sku-wrapper product_meta align-items-center d-flex gap-1"
+                                                id="stock">
+                                                <i class="fa-solid fa-circle fs-10"></i>
+                                                <span class="fs-7 fw-semibold text-dark">{{ trans('labels.stock') }} :
                                                 </span>
                                                 <span class="fs-7" id="detail_out_of_stock"></span>
                                             </div>
@@ -207,16 +217,22 @@
                                                 @if ($productdata->attchment_name != '' && $productdata->attchment_name != null)
                                                     <a href="{{ $productdata->attchment_url }}" target="_blank"
                                                         class="text-dark">
-                                                        <p class="fs-7 fw-semibold d-flex align-items-center gap-2">
-                                                            {{ $productdata->attchment_name }}
-                                                            <i class="fa-light fa-file fs-7"></i>
+                                                        <p class="fs-7 fw-semibold d-flex align-items-center gap-1">
+                                                            <i class="fa-solid fa-circle fs-10"></i>
+                                                            <span>{{ $productdata->attchment_name }} :</span>
+                                                            <span>
+                                                                <i class="fa-light fa-file fs-7"></i>
+                                                            </span>
                                                         </p>
                                                     </a>
                                                 @else
                                                     <a href="{{ $productdata->attchment_url }}" target="_blank">
-                                                        <p class="fs-7 fw-semibold d-flex align-items-center gap-2">
-                                                            {{ trans('labels.click_here') }}
-                                                            <i class="fa-light fa-file fs-7"></i>
+                                                        <p class="fs-7 fw-semibold d-flex align-items-center gap-1">
+                                                            <i class="fa-solid fa-circle fs-10"></i>
+                                                            <span> {{ trans('labels.click_here') }} :</span>
+                                                            <span>
+                                                                <i class="fa-light fa-file fs-7"></i>
+                                                            </span>
                                                         </p>
                                                     </a>
                                                 @endif
@@ -278,8 +294,10 @@
                                                         <li class="mb-2">
                                                             <div
                                                                 class="form-check m-0 p-0 d-flex gap-2 align-items-center">
-                                                                <input type="checkbox" class="form-check-input p-0 m-0 Checkbox"
-                                                                    name="addons[]" extras_name="{{ $extras->name }}" value="{{ $extras->id }}"
+                                                                <input type="checkbox"
+                                                                    class="form-check-input p-0 m-0 Checkbox"
+                                                                    name="addons[]" extras_name="{{ $extras->name }}"
+                                                                    value="{{ $extras->id }}"
                                                                     price="{{ $extras->price }}"
                                                                     id="extracheck_{{ $key }}_{{ $productdata->id }}">
                                                                 <label class="form-check-label w-100 m-0 p-0"
@@ -348,9 +366,9 @@
                                                     @endphp
                                                     @if (
                                                         $whatsapp_message == 1 &&
-                                                            helper::appdata($vendordata->id)->whatsapp_number != '' &&
-                                                            helper::appdata($vendordata->id)->whatsapp_number != null)
-                                                        <a href="https://api.whatsapp.com/send?phone={{ helper::appdata($vendordata->id)->whatsapp_number }}'&text= {{ $productdata->name }}"
+                                                            @whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number != '' &&
+                                                            @whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number != null)
+                                                        <a href="https://api.whatsapp.com/send?phone={{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}&text={{ $productdata->name }}"
                                                             class="btn py-2 btn-danger btn-enquir rounded-0 w-100"
                                                             id="enquiries" target="_blank">
                                                             <span class="px-1 fs-7 d-flex align-items-center gap-1">
@@ -362,9 +380,10 @@
                                                 @endif
                                             @else
                                                 @if (@helper::checkaddons('whatsapp_message'))
-                                                    @if (helper::appdata($vendordata->id)->whatsapp_number != '' &&
-                                                            helper::appdata($vendordata->id)->whatsapp_number != null)
-                                                        <a href="https://api.whatsapp.com/send?phone={{ helper::appdata($vendordata->id)->whatsapp_number }}'&text= {{ $productdata->name }}"
+                                                    @if (
+                                                        @whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number != '' &&
+                                                            @whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number != null)
+                                                        <a href="https://api.whatsapp.com/send?phone={{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}&text={{ $productdata->name }}"
                                                             class="btn py-2 btn-danger btn-enquir rounded-0 w-100"
                                                             id="enquiries" target="_blank">
                                                             <span class="px-1 fs-7 d-flex align-items-center gap-1">
@@ -382,14 +401,14 @@
                                                 <div class="col-xl-3 col-6">
                                                     <button
                                                         class="btn m-0 py-2 btn-secondary rounded-0 w-100 add-btn addtocart"
-                                                        onclick="addtocart('{{ $productdata->id }}','{{ $productdata->slug }}','{{ $productdata->name }}','{{ $productdata['product_image']->image }}','{{ $productdata->tax }}',$('#item_price').val(),'{{ ucfirst($productdata->attribute) }}','{{ URL::to(@$vendordata->slug . '/cart/add') }}','0')">
+                                                        onclick="addtocart('{{ $productdata->id }}','{{ $productdata->slug }}','{{ $productdata->name }}','{{ $productdata['product_image']->image }}','{{ $productdata->tax }}',$('#overview_item_price').val(),'{{ ucfirst($productdata->attribute) }}','{{ URL::to(@$vendordata->slug . '/cart/add') }}','0')">
                                                         <span class="px-1 fs-7">{{ trans('labels.add_to_cart') }}</span>
                                                     </button>
                                                 </div>
                                                 <div class="col-xl-3 col-6">
                                                     <button
                                                         class="btn btn-lg m-0 bg-white border-dark rounded-0 w-100 fs-6 text-dark buynow"
-                                                        onclick="addtocart('{{ $productdata->id }}','{{ $productdata->slug }}','{{ $productdata->name }}','{{ $productdata['product_image']->image }}','{{ $productdata->tax }}',$('#item_price').val(),'{{ ucfirst($productdata->attribute) }}','{{ URL::to(@$vendordata->slug . '/cart/add') }}','1')">
+                                                        onclick="addtocart('{{ $productdata->id }}','{{ $productdata->slug }}','{{ $productdata->name }}','{{ $productdata['product_image']->image }}','{{ $productdata->tax }}',$('#overview_item_price').val(),'{{ ucfirst($productdata->attribute) }}','{{ URL::to(@$vendordata->slug . '/cart/add') }}','1')">
                                                         <span class="px-1 fs-7">{{ trans('labels.buy_now') }}</span>
                                                     </button>
                                                 </div>
@@ -410,7 +429,7 @@
                                                     <span class=" btn-sm btn-Wishlist mx-2 bg-primary">
                                                         @if (Auth::user() && Auth::user()->type == 3)
                                                             @php
-                                                                $favorite = helper::ceckfavorite(
+                                                                $favorite = helper::checkfavorite(
                                                                     $productdata->id,
                                                                     $vendordata->id,
                                                                     Auth::user()->id,
@@ -476,9 +495,14 @@
                             </li>
                         @endif
                     @endif
+                    @if (@helper::checkaddons('product_inquiry'))
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link p-3 px-4" href="javascript:void(0)" data-bs-toggle="pill"
+                                data-bs-target="#pills-product_inquiry">{{ trans('labels.product_inquiry') }}</a>
+                        </li>
+                    @endif
                 </ul>
                 <div class="tab-content mb-3" id="read-moreContent">
-
                     <div class="tab-pane fade" id="pills-additional_info" role="tabpanel"
                         aria-labelledby="pills-additional_info-tab">{!! $productdata->additional_info !!}</div>
                     <div class="tab-pane fade active show" id="pills-description" role="tabpanel"
@@ -486,8 +510,74 @@
                     @if (@helper::checkaddons('product_reviews'))
                         @include('web.product_review')
                     @endif
+                    @if (@helper::checkaddons('product_inquiry'))
+                        <div class="tab-pane fade" id="pills-product_inquiry" role="tabpanel"
+                            aria-labelledby="pills-product_inquiry-tab">
+                            <div class="card sevirce-trued">
+                                <div class="card-body">
+                                    <form action="{{ URL::to('product_inquiry') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $productdata->id }}">
+                                        <input type="hidden" name="vendor_id" value="{{ $productdata->vendor_id }}">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="first_name" class="form-label gap-1">
+                                                    {{ trans('labels.first_name') }}
+                                                    <div aria-hidden="true" class="text-danger">*</div>
+                                                </label>
+                                                <input type="text" class="form-control rounded-0 input-h"
+                                                    id="first_name" name="first_name"
+                                                    placeholder="{{ trans('labels.first_name') }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="last_name" class="form-label gap-1">
+                                                    {{ trans('labels.last_name') }}
+                                                    <div aria-hidden="true" class="text-danger">*</div>
+                                                </label>
+                                                <input type="text" class="form-control rounded-0 input-h"
+                                                    name="last_name" placeholder="{{ trans('labels.last_name') }}"
+                                                    id="last_name" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="email" class="form-label gap-1">
+                                                    {{ trans('labels.email') }}
+                                                    <div aria-hidden="true" class="text-danger">*</div>
+                                                </label>
+                                                <input type="email" class="form-control rounded-0 input-h"
+                                                    id="email" name="email"
+                                                    placeholder="{{ trans('labels.email') }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="mobile" class="form-label gap-1">
+                                                    {{ trans('labels.mobile') }}
+                                                    <div aria-hidden="true" class="text-danger">*</div>
+                                                </label>
+                                                <input type="text" class="form-control rounded-0 input-h number"
+                                                    name="mobile" placeholder="{{ trans('labels.mobile') }}"
+                                                    id="mobile" required>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="message" class="form-label gap-1">
+                                                    {{ trans('labels.comment') }}
+                                                    <div aria-hidden="true" class="text-danger">*</div>
+                                                </label>
+                                                <p class="fs-10 mb-1">{{ trans('labels.note') }}
+                                                    {{ trans('messages.product_inquiry_note') }}</p>
+                                                <textarea class="form-control rounded-0 m-0" id="message" placeholder="{{ trans('labels.textarea') }}"
+                                                    name="message" rows="3" required></textarea>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-primary rounded-0 m-0">
+                                                    {{ trans('labels.submit') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
-                <!-- description section end-->
             </div>
         </section>
         <!-- PRODUCTS VIEW AREA END -->
@@ -670,7 +760,6 @@
             </div>
 
         </section>
-        {{ $getrelatedproductslist->appends(request()->query())->links() }}
     @endif
     <!-- RELATED PRODUCTS AREA END -->
 @endsection
@@ -740,7 +829,7 @@
                         $('#variants_name').val(variants);
 
                         $('#modal_product_price').text(currency_formate(parseFloat(price)));
-                        $('#item_price').val(price);
+                        $('#overview_item_price').val(price);
                         $('#modal_price-off').removeClass('d-none');
                         if (parseFloat(original_price) > parseFloat(price)) {
                             $('#modal_product-original-price').text(currency_formate(parseFloat(

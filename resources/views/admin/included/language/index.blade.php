@@ -8,7 +8,7 @@
     }
 @endphp
 @section('content')
-    @if (Auth::user()->type == 1)
+    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
         <div class="alert alert-warning" role="alert">
             <p>Don't use double quote (") and back slash (\) in the language fields.</p>
         </div>
@@ -17,18 +17,18 @@
     <div class="row settings">
         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
             <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.language-settings') }}</h5>
-            @if (Auth::user()->type == 1)
+            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                 @if (@helper::checkaddons('language'))
                     <div class="col-auto">
                         <a href="{{ URL::to('/admin/language-settings/add') }}"
-                            class="btn w-100 btn-secondary justify-content-center text-capitalize px-sm-4 d-flex">
+                            class="btn w-100 btn-secondary justify-content-center text-capitalize px-sm-4 d-flex {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
                             <i class="fa-regular fa-plus mx-1"></i>{{ trans('labels.add') }}</a>
                     </div>
                 @endif
             @endif
 
         </div>
-        @if (Auth::user()->type == 1)
+        @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
             <div class="col-xl-3 mb-3">
                 <div class="card card-sticky-top border-0">
                     <ul class="list-group list-options">
@@ -39,7 +39,8 @@
                                 <div class="d-flex justify-content-between align-item-center">
                                     {{ $data->name }}
                                     <div class="d-flex align-item-center">
-                                        <i class="fa-regular fa-angle-right ps-2"></i>
+                                        <i
+                                            class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }} ps-2"></i>
                                     </div>
                                 </div>
                             </a>
@@ -49,27 +50,34 @@
             </div>
             <div class="col-xl-9">
                 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <div
-                        class="dropdown {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, $vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
+                    <div class="dropdown">
                         <div class="d-flex flex-wrap gap-2">
-                            <a class="btn btn-sm btn-info hov" tooltip="{{ trans('labels.edit') }}"
-                                href="{{ URL::to('/admin/language-settings/language/edit-' . $currantLang->id) }}"><i
-                                    class="fa-regular fa-pen-to-square"></i></a>
+                            <a class="btn btn-sm btn-info hov {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                tooltip="{{ trans('labels.edit') }}"
+                                href="{{ URL::to('/admin/language-settings/language/edit-' . $currantLang->id) }}">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
                             @if (Strtolower($currantLang->name) != 'english')
-                                <a class="btn btn-danger hov" tooltip="{{ trans('labels.delete') }}"
+                                <a class="btn btn-danger hov {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, Auth::user()->vendor_id, 'delete') == 1 ? '' : 'd-none') : '' }}"
+                                    tooltip="{{ trans('labels.delete') }}"
                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/language-settings/layout/delete-' . $currantLang->id . '/1') }}')" @endif>
-                                    <i class="fa-regular fa-trash"></i> </a>
+                                    <i class="fa-regular fa-trash"></i>
+                                </a>
                             @endif
                             @if ($currantLang->is_available == '1')
                                 @if (helper::available_language('')->count() > 1)
                                     <a tooltip="{{ trans('labels.active') }}"
                                         @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/language-settings/status-' . $currantLang->id . '/2') }}')" @endif
-                                        class="btn btn-success hov"><i class="fas fa-check"></i></a>
+                                        class="btn btn-success hov {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
+                                        <i class="fas fa-check"></i>
+                                    </a>
                                 @endif
                             @else
                                 <a tooltip="{{ trans('labels.inactive') }}"
                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/language-settings/status-' . $currantLang->id . '/1') }}')" @endif
-                                    class="btn btn-danger hov"><i class="fas fa-close"></i></a>
+                                    class="btn btn-danger hov {{ Auth::user()->type == 4 ? (helper::check_access('role_language_settings', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
+                                    <i class="fas fa-close"></i>
+                                </a>
                             @endif
                         </div>
                     </div>
@@ -86,9 +94,7 @@
                                 @foreach (helper::available_language('') as $item)
                                     <option value="item"
                                         {{ $item->code == helper::appdata('')->default_language ? 'selected' : '' }}
-                                        @if (Request()->code != null && Request()->code != '') data-value="{{ URL::to('admin/language-settings/' . Request()->code . '?lang=' . $item->code) }}">
-                                 @else
-                                 data-value="{{ URL::to('admin/language-settings/?lang=' . $item->code) }}"> @endif
+                                        @if (Request()->code != null && Request()->code != '') data-value="{{ URL::to('admin/language-settings/' . Request()->code . '?lang=' . $item->code) }}" @else data-value="{{ URL::to('admin/language-settings/?lang=' . $item->code) }}" @endif>
                                         {{ $item->name }}</option>
                                 @endforeach
                             </select>
@@ -136,17 +142,11 @@
                                         <div class="col-lg-12">
                                             <div class="text-end">
                                                 <div class="d-flex justify-content-end">
-                                                    @if (env('Environment') == 'sendbox')
-                                                        <button type="button" class="btn btn-raised btn-primary px-sm-4"
-                                                            onclick="myFunction()"><i class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }} </button>
-                                                    @else
-                                                        <button type="submit"
-                                                            class="btn btn-raised btn-primary px-sm-4"><i
-                                                                class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }}
-                                                        </button>
-                                                    @endif
+                                                    <button
+                                                        @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
+                                                        class="btn btn-secondary px-sm-4">
+                                                        {{ trans('labels.save') }}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -181,16 +181,11 @@
                                         <div class="col-lg-12">
                                             <div class="text-end">
                                                 <div class="d-flex justify-content-end">
-                                                    @if (env('Environment') == 'sendbox')
-                                                        <button type="button" class="btn btn-raised btn-secondary"
-                                                            onclick="myFunction()"><i class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }} </button>
-                                                    @else
-                                                        <button type="submit" class="btn btn-raised btn-secondary"><i
-                                                                class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }}
-                                                        </button>
-                                                    @endif
+                                                    <button
+                                                        @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
+                                                        class="btn btn-secondary px-sm-4">
+                                                        {{ trans('labels.save') }}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -225,16 +220,11 @@
                                         <div class="col-lg-12">
                                             <div class="text-end">
                                                 <div class="d-flex justify-content-end">
-                                                    @if (env('Environment') == 'sendbox')
-                                                        <button type="button" class="btn btn-raised btn-secondary"
-                                                            onclick="myFunction()"><i class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }} </button>
-                                                    @else
-                                                        <button type="submit" class="btn btn-raised btn-secondary"><i
-                                                                class="fa fa-check-square-o"></i>
-                                                            {{ trans('labels.save') }}
-                                                        </button>
-                                                    @endif
+                                                    <button
+                                                        @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
+                                                        class="btn btn-secondary px-sm-4">
+                                                        {{ trans('labels.save') }}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -246,7 +236,7 @@
                 </div>
             </div>
         @endif
-        @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+        @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
             <div class="col-12">
                 <div class="card border-0 my-3">
                     <div class="card-body">

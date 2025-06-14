@@ -17,4 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/fashionhub-saas
+/storage/app/public/admin-assets
+/storage/framework
+/storage/app/files

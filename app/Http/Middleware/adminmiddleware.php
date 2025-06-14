@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\helper\helper;
+
 class adminmiddleware
 
 {
@@ -34,24 +35,20 @@ class adminmiddleware
 
     {
 
-        if (Auth::user() && Auth::user()->type==1) {
+        if (Auth::user() && Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1)) {
 
             if (Auth::user()->type == 4) {
                 $vendor_id = Auth::user()->vendor_id;
             } else {
                 $vendor_id = Auth::user()->id;
             }
-            
-            date_default_timezone_set(@helper::appdata($vendor_id)->timezone); 
+
+            date_default_timezone_set(@helper::appdata($vendor_id)->timezone);
 
 
             return $next($request);
-
         }
 
         return redirect()->back();
-
     }
-
 }
-

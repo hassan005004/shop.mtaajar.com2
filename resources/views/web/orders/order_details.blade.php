@@ -11,7 +11,7 @@
                     </li>
                     <li class="text-muted {{ session()->get('direction') == 2 ? 'breadcrumb-item-rtl' : ' breadcrumb-item ' }} active"
                         aria-current="page">{{ trans('labels.order_details') }}</li>
-                </ol>   
+                </ol>
             </nav>
         </div>
     </section>
@@ -45,8 +45,8 @@
                     <div class="card border-0 rounded-0 bg-light mb-3">
                         <div class="card-body">
                             <div class="row align-items-center justify-content-between">
-                                <div class="col-12 col-md-8 col-lg-8 col-xl-6">
-                                    <div class="d-md-flex justify-content-between">
+                                <div class="col-12 col-md-9 col-lg-9 col-xl-6">
+                                    <div class="d-md-flex">
                                         <div>
                                             <div class="d-flex align-items-center justify-contente-between py-2">
                                                 <span class="text-dark fw-600 fs-15">{{ trans('labels.order_id') }}
@@ -78,7 +78,15 @@
                                                         @elseif($getorderdata->status_type == 3)
                                                             {{ @helper::gettype($getorderdata->status, $getorderdata->status_type, $getorderdata->order_type, $getorderdata->vendor_id)->name }}
                                                         @endif
-
+                                                    </p>
+                                                </div>
+                                            @endif
+                                            @if ($getorderdata->tips > 0)
+                                                <div class="d-flex align-items-center justify-contente-between py-2">
+                                                    <span class="text-dark fw-600 fs-15">{{ trans('labels.tips_pro') }}
+                                                        :&nbsp;</span>
+                                                    <p class="fs-7">
+                                                        {{ helper::currency_formate($getorderdata->tips, $getorderdata->vendor_id) }}
                                                     </p>
                                                 </div>
                                             @endif
@@ -92,8 +100,14 @@
                                                             {{ trans('labels.online') }}
                                                         @else
                                                             {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
+                                                            @if ($getorderdata->transaction_type == 6)
+                                                                : <small>
+                                                                    <a href="{{ helper::image_path($getorderdata->screenshot) }}"
+                                                                        target="_blank"
+                                                                        class="text-danger">{{ trans('labels.click_here') }}</a>
+                                                                </small>
+                                                            @endif
                                                         @endif
-
                                                     </span>
                                                 </li>
                                                 @if (
@@ -101,7 +115,7 @@
                                                         $getorderdata->transaction_type != '6' &&
                                                         $getorderdata->transaction_type != '16' &&
                                                         $getorderdata->transaction_type != '0')
-                                                    <li class="list-group-item d-flex px-0 bg-light">
+                                                    <li class="list-group-item d-flex px-0 bg-light fs-7">
                                                         <strong>{{ trans('labels.payment_id') }} :&nbsp;</strong>
                                                         <span>{{ $getorderdata->transaction_id }}</span>
                                                     </li>
@@ -110,7 +124,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4 col-lg-3 col-xl-2">
+                                <div class="col-12 col-md-3 col-lg-3 col-xl-2">
                                     @if ($getorderdata->status_type == 1)
                                         <a class="btn btn-danger text-white btn-outline-danger fw-500 {{ session()->get('direction') == 2 ? 'float-start' : 'float-end' }}"
                                             href="javascript:void(0)"
@@ -137,7 +151,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if (helper::appdata($vendordata->id)->product_type == 1)
+                            @if ($getorderdata->order_type == 1)
                                 <div
                                     class="col-md-4 mb-3 mb-md-0 {{ session()->get('direction') == 2 ? 'text-end' : ' text-start' }}">
                                     <div class="card border-0 bg-light rounded-0 h-100">
@@ -193,12 +207,11 @@
                                 <div class="col-12">
                                     <div class="card border-0 bg-light rounded-0 h-100">
                                         <div class="card-body">
-                                            <span class="text-dark fw-bold"> {{ trans('labels.note') }} :
+                                            <span class="text-dark fw-bold"> {{ trans('labels.note') }}
                                             </span>
                                             <p class="fs-7 mt-1">
                                                 {{ $getorderdata->notes }}
                                             </p>
-
                                         </div>
                                     </div>
                                 </div>
@@ -210,7 +223,7 @@
                                 <div class="card border-0 bg-light rounded-0">
                                     <div class="card-body">
                                         <div class="table-responsive">
-                                            <table class="table">
+                                            <table class="table m-0">
                                                 <thead>
                                                     <tr class="text-capitalize fs-15 fw-600">
                                                         <td>{{ trans('labels.image') }}</td>
@@ -225,17 +238,20 @@
                                                     @foreach ($getorderitemlist as $product)
                                                         <tr class="fs-7 fw-500 align-middle">
                                                             @if ($product->extras_id != '')
-                                                                <?php
-                                                                
-                                                                $extras_id = explode('|', $product->extras_id);
-                                                                
-                                                                $extras_name = explode('|', $product->extras_name);
-                                                                
-                                                                $extras_price = explode('|', $product->extras_price);
-                                                                
-                                                                $extras_total_price = 0;
-                                                                
-                                                                ?>
+                                                                @php
+
+                                                                    $extras_id = explode('|', $product->extras_id);
+
+                                                                    $extras_name = explode('|', $product->extras_name);
+
+                                                                    $extras_price = explode(
+                                                                        '|',
+                                                                        $product->extras_price,
+                                                                    );
+
+                                                                    $extras_total_price = 0;
+
+                                                                @endphp
                                                                 <br>
                                                                 @foreach ($extras_id as $key => $addons)
                                                                     @php
@@ -330,13 +346,21 @@
                                                     </li>
                                                 @endforeach
                                             @endif
-                                            @if ($getorderdata->delivery_charge != null && $getorderdata->delivery_charge != '')
+                                            @if ($getorderdata->order_type == 1)
                                                 <li
                                                     class="list-group-item d-flex justify-content-between px-0 py-2 border-0 bg-light">
-                                                    <span
-                                                        class="fw-500 fs-15">{{ trans('labels.delivery_charge') }}({{ $getorderdata->shipping_area }})</span>
-                                                    <span
-                                                        class="fw-600 fs-15">{{ helper::currency_formate($getorderdata->delivery_charge, $getorderdata->vendor_id) }}</span>
+                                                    <span class="fw-500 fs-15">{{ trans('labels.delivery') }}
+                                                        @if ($getorderdata->shipping_area != '')
+                                                            ({{ $getorderdata->shipping_area }})
+                                                        @endif
+                                                    </span>
+                                                    <span class="fw-600 fs-15">
+                                                        @if ($getorderdata->delivery_charge > 0)
+                                                            {{ helper::currency_formate($getorderdata->delivery_charge, $getorderdata->vendor_id) }}
+                                                        @else
+                                                            {{ trans('labels.free') }}
+                                                        @endif
+                                                    </span>
                                                 </li>
                                             @endif
                                             <li
@@ -373,7 +397,8 @@
             if (variations != '') {
                 html += '<p class="fw-600 m-0 text-dark" id="variation_title">' + variation_title +
                     '</p><ul class="mt-1 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
-                html += '<li class="px-0 fs-7 fw-500 my-1 d-flex align-items-center justify-content-between">' + variations + '<span class="text-dark fs-7">' +
+                html += '<li class="px-0 fs-7 fw-500 my-1 d-flex align-items-center justify-content-between">' +
+                    variations + '<span class="text-dark fs-7">' +
                     currency_formate(parseFloat(
                         variation_price)) + '</span></li>'
                 html += '</ul>';
@@ -382,9 +407,11 @@
             var html1 = '';
             if (extras != '') {
                 $('#extras_title').removeClass('d-none');
-                html1 += '<p class="fw-600 m-0" id="extras_title">' + extra_title + '</p><ul class="m-0 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
+                html1 += '<p class="fw-600 m-0" id="extras_title">' + extra_title +
+                    '</p><ul class="m-0 {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">';
                 for (i in extras) {
-                    html1 += '<li class="px-0 fs-7 my-1 fw-500 d-flex align-items-center justify-content-between">' + extras[i] + '<span class="text-dark fs-7">' +
+                    html1 += '<li class="px-0 fs-7 my-1 fw-500 d-flex align-items-center justify-content-between">' +
+                        extras[i] + '<span class="text-dark fs-7">' +
                         currency_formate(parseFloat(
                             extra_price[i])) + '</span></li>'
                 }

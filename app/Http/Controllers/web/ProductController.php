@@ -17,7 +17,7 @@ use App\Models\Cart;
 use App\Models\User;
 use URL;
 use DB;
-use App;
+use Illuminate\Support\Facades\App;
 use Session;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,7 +42,7 @@ class ProductController extends Controller
         $productdata->variants_json = json_decode($productdata->variants_json, true);
         $raplceid = str_replace('|', ',', $productdata->sub_category_id);
 
-        $getrelatedproductslist = Products::with('product_image', 'multi_image', 'multi_variation', 'category_info', 'subcategory_info')->where('id', '!=', @$productdata->id)->where('category_id', @$productdata->category_id)->where('vendor_id', $vdata)->where('is_available', 1)->where('is_deleted', 2)->orderBy('reorder_id')->paginate(8)->onEachSide(0);
+        $getrelatedproductslist = Products::with('product_image', 'multi_image', 'multi_variation', 'category_info', 'subcategory_info')->where('id', '!=', @$productdata->id)->where('category_id', @$productdata->category_id)->where('vendor_id', $vdata)->where('is_available', 1)->where('is_deleted', 2)->orderBy('reorder_id')->get();
 
         $review = Testimonials::where('vendor_id', $vendordata->id)->where('product_id', $productdata->id)->orderBy('reorder_id')->get();
         $averagerating = Testimonials::where('product_id', $productdata->id)->where('vendor_id', $vendordata->id)->avg('star');
@@ -122,6 +122,10 @@ class ProductController extends Controller
             $getproductslist = $getproductslist->orderBy('products.price');
         } elseif ($request->type == "price-high-low") {
             $getproductslist = $getproductslist->orderByDesc('products.price');
+        } elseif ($request->type == "rating-low-high") {
+            $getproductslist = $getproductslist->orderBy('ratings_average');
+        } elseif ($request->type == "rating-high-low") {
+            $getproductslist = $getproductslist->orderByDesc('ratings_average');
         } elseif ($request->type == "best-selling-products") {
             $getproductslist = $getproductslist->inRandomOrder();
         } else {
@@ -137,7 +141,7 @@ class ProductController extends Controller
             $category = Category::where('slug', $request->category)->first();
             $subcategories = SubCategory::where('category_id', $category->id)->where('is_available', 1)->where('is_deleted', 2)->orderBy('reorder_id')->get();
         }
-        $getproductslist = $getproductslist->paginate(20)->onEachSide(0);
+        $getproductslist = $getproductslist->paginate(20);
         return view('web.viewallproducts', compact('vendordata', 'getproductslist', 'getcategorydata', 'getsubcategorydata', 'subcategories', 'vdata'));
     }
     public function getproductdata(Request $request)
@@ -234,9 +238,9 @@ class ProductController extends Controller
             ->groupBy('products.id')
             ->where('products.is_available', "1")
             ->where('products.top_deals', '1')
-            ->where('products.is_deleted', "2")->where('products.vendor_id', $vendordata->id)->paginate(20)->onEachSide(0);
-        $topdeals = TopDeals::where('vendor_id', $vendordata->id)->first();
-        return view('web.viewalltopdeals', compact('topdealsproducts', 'vendordata', 'vdata', 'topdeals'));
+            ->where('products.is_deleted', "2")
+            ->where('products.vendor_id', $vendordata->id)->paginate(20);
+        return view('web.viewalltopdeals', compact('topdealsproducts', 'vendordata', 'vdata'));
     }
     public function getProductsVariantQuantity(Request $request)
     {

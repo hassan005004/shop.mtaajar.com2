@@ -5,7 +5,8 @@
 
         <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.countries') }}</h5>
 
-        <a href="{{ URL::to('admin/countries/add') }}" class="btn btn-secondary px-sm-4 text-capitalize d-flex">
+        <a href="{{ URL::to('admin/countries/add') }}"
+            class="btn btn-secondary px-sm-4 text-capitalize d-flex {{ Auth::user()->type == 4 ? (helper::check_access('role_countries', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
 
             <i class="fa-regular fa-plus mx-1"></i>{{ trans('labels.add') }}
 
@@ -64,14 +65,16 @@
 
                                             @if ($country->is_available == '1')
                                                 <a @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/countries/change_status-' . $country->id . '/2') }}')" @endif
-                                                    class="btn btn-sm btn-outline-success hov"
-                                                    tooltip="{{ trans('labels.active') }}"><i
-                                                        class="fa-regular fa-check"></i></a>
+                                                    class="btn btn-sm btn-outline-success hov {{ Auth::user()->type == 4 ? (helper::check_access('role_countries', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                                    tooltip="{{ trans('labels.active') }}">
+                                                    <i class="fa-regular fa-check"></i>
+                                                </a>
                                             @else
                                                 <a @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/countries/change_status-' . $country->id . '/1') }}')" @endif
-                                                    class="btn btn-sm btn-outline-danger hov"
-                                                    tooltip="{{ trans('labels.inactive') }}"><i
-                                                        class="fa-regular fa-xmark"></i></a>
+                                                    class="btn btn-sm btn-outline-danger hov {{ Auth::user()->type == 4 ? (helper::check_access('role_countries', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                                    tooltip="{{ trans('labels.inactive') }}">
+                                                    <i class="fa-regular fa-xmark"></i>
+                                                </a>
                                             @endif
                                         </td>
                                         <td>{{ helper::date_formate($country->created_at, $country->vendor_id) }}<br>
@@ -83,12 +86,15 @@
                                         <td>
                                             <div class="d-flex gap-2">
                                                 <a href="{{ URL::to('admin/countries/edit-' . $country->id) }}"
-                                                    class="btn hov btn-info btn-sm" tooltip="{{ trans('labels.edit') }}">
-                                                    <i class="fa-regular fa-pen-to-square"></i></a>
+                                                    class="btn hov btn-info btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_countries', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                                    tooltip="{{ trans('labels.edit') }}">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </a>
                                                 <a @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/countries/delete-' . $country->id) }}')" @endif
-                                                    class="btn hov btn-danger btn-sm"
-                                                    tooltip="{{ trans('labels.delete') }}"> <i
-                                                        class="fa-regular fa-trash"></i></a>
+                                                    class="btn hov btn-danger btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_countries', Auth::user()->role_id, Auth::user()->vendor_id, 'delete') == 1 ? '' : 'd-none') : '' }}"
+                                                    tooltip="{{ trans('labels.delete') }}">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </a>
                                             </div>
                                         </td>
 

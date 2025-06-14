@@ -17,25 +17,26 @@
                     <a href="#basicinfo" data-tab="basicinfo"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center active"
                         aria-current="true">{{ trans('labels.basic_info') }}
-                        <i class="fa-regular fa-angle-right"></i>
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                     </a>
-                    @if (Auth::user()->type == 1)
+                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                         <a href="#theme_images" data-tab="theme_images"
                             class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                            aria-current="true">{{ trans('labels.theme') }} {{ trans('labels.images') }} <i
-                                class="fa-regular fa-angle-right"></i></a>
+                            aria-current="true">{{ trans('labels.theme') }} {{ trans('labels.images') }}
+                            <i
+                                class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i></a>
                     @endif
                     <a href="#editprofile" data-tab="editprofile"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                         aria-current="true">{{ trans('labels.edit_profile') }}
-                        <i class="fa-regular fa-angle-right"></i>
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                     </a>
                     <a href="#changepasssword" data-tab="changepasssword"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                         aria-current="true">{{ trans('labels.change_password') }}
-                        <i class="fa-regular fa-angle-right"></i>
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                     </a>
-                    @if (Auth::user()->type == 1)
+                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                         @if (@helper::checkaddons('google_recaptcha'))
                             <a href="#recaptcha" data-tab="recaptcha"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
@@ -43,94 +44,24 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
-                    @endif
-                    @if (Auth::user()->type == 2 || Auth::user()->type == 4)
-                        @if (@helper::checkaddons('subscription'))
-                            @if (@helper::checkaddons('whatsapp_message'))
-                                @php
-                                    $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
-                                        ->orderByDesc('id')
-                                        ->first();
-
-                                    if ($user->allow_without_subscription == 1) {
-                                        $whatsapp_message = 1;
-                                    } else {
-                                        $whatsapp_message = @$checkplan->whatsapp_message;
-                                    }
-                                @endphp
-                                @if ($whatsapp_message == 1)
-                                    <a href="#whatsapp" data-tab="whatsapp"
-                                        class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                        aria-current="true">{{ trans('labels.whatsapp_message_settings') }}
-                                        <div class="d-flex gap-2 align-items-center">
-                                            @if (env('Environment') == 'sendbox')
-                                                <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                            @endif
-                                            <i class="fa-regular fa-angle-right"></i>
-                                        </div>
-                                    </a>
-                                @endif
-                            @endif
-                        @else
-                            @if (@helper::checkaddons('whatsapp_message'))
-                                <a href="#whatsapp" data-tab="whatsapp"
-                                    class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                    aria-current="true">{{ trans('labels.whatsapp_message_settings') }}
-                                    <div class="d-flex gap-2 align-items-center">
-                                        @if (env('Environment') == 'sendbox')
-                                            <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                        @endif
-                                        <i class="fa-regular fa-angle-right"></i>
-                                    </div>
-                                </a>
-                            @endif
+                        @if (@helper::checkaddons('whatsapp_message'))
+                            <a href="#whatsapp" data-tab="whatsapp"
+                                class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                                aria-current="true">{{ trans('labels.whatsapp_settings') }}
+                                <div class="d-flex gap-2 align-items-center">
+                                    @if (env('Environment') == 'sendbox')
+                                        <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
+                                    @endif
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                                </div>
+                            </a>
                         @endif
-                        @if (@helper::checkaddons('subscription'))
-                            @if (@helper::checkaddons('telegram_message'))
-                                @php
-                                    $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
-                                        ->orderByDesc('id')
-                                        ->first();
-
-                                    if ($user->allow_without_subscription == 1) {
-                                        $telegram_message = 1;
-                                    } else {
-                                        $telegram_message = @$checkplan->telegram_message;
-                                    }
-                                @endphp
-                                @if ($telegram_message == 1)
-                                    <a href="#telegram" data-tab="telegram"
-                                        class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                        aria-current="true">{{ trans('labels.telegram_message_settings') }}
-                                        <div class="d-flex gap-2 align-items-center">
-                                            @if (env('Environment') == 'sendbox')
-                                                <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                            @endif
-                                            <i class="fa-regular fa-angle-right"></i>
-                                        </div>
-                                    </a>
-                                @endif
-                            @endif
-                        @else
-                            @if (@helper::checkaddons('telegram_message'))
-                                <a href="#telegram" data-tab="telegram"
-                                    class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                    aria-current="true">{{ trans('labels.telegram_message_settings') }}
-                                    <div class="d-flex gap-2 align-items-center">
-                                        @if (env('Environment') == 'sendbox')
-                                            <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                        @endif
-                                        <i class="fa-regular fa-angle-right"></i>
-                                    </div>
-                                </a>
-                            @endif
-                        @endif
-
-
                     @endif
                     @if (@helper::checkaddons('email_settings'))
                         <a href="#email_settings" data-tab="email_settings"
@@ -140,7 +71,8 @@
                                 @if (env('Environment') == 'sendbox')
                                     <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                 @endif
-                                <i class="fa-regular fa-angle-right"></i>
+                                <i
+                                    class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                             </div>
                         </a>
                         <a href="#email_template" data-tab="email_template"
@@ -150,11 +82,12 @@
                                 @if (env('Environment') == 'sendbox')
                                     <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                 @endif
-                                <i class="fa-regular fa-angle-right"></i>
+                                <i
+                                    class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                             </div>
                         </a>
                     @endif
-                    @if (Auth::user()->type == 1)
+                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                         @if (@helper::checkaddons('tawk_addons'))
                             <a href="#tawk_settings" data-tab="tawk_settings"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
@@ -163,7 +96,8 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -174,7 +108,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -185,12 +120,13 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
                     @endif
-                    @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                    @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                         @if (@helper::checkaddons('google_login'))
                             <a href="#google_login_settings" data-tab="google_login_settings"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
@@ -199,7 +135,8 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -211,7 +148,8 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -223,7 +161,8 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -235,7 +174,8 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -256,7 +196,7 @@
                                     <a href="#pixel_settings" data-tab="pixel_settings"
                                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                                         aria-current="true">{{ trans('labels.pixel_settings') }} <i
-                                            class="fa-regular fa-angle-right"></i></a>
+                                            class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i></a>
                                 @endif
                             @endif
                         @else
@@ -264,14 +204,14 @@
                                 <a href="#pixel_settings" data-tab="pixel_settings"
                                     class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                                     aria-current="true">{{ trans('labels.pixel_settings') }} <i
-                                        class="fa-regular fa-angle-right"></i></a>
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i></a>
                             @endif
                         @endif
                         @if (@helper::checkaddons('shopify'))
                             <a href="#shopify_settings" data-tab="shopify_settings"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                                 aria-current="true">{{ trans('labels.shopify_settings') }} <i
-                                    class="fa-regular fa-angle-right"></i></a>
+                                    class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i></a>
                         @endif
                         @if (@helper::checkaddons('tawk_addons'))
                             <a href="#tawk_settings" data-tab="tawk_settings"
@@ -280,7 +220,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -291,7 +232,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -302,7 +244,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -313,7 +256,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -324,7 +268,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -335,7 +280,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -346,7 +292,8 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -357,14 +304,18 @@
                                 <div class="d-flex gap-2 align-items-center">
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
-                                    @endif <i class="fa-regular fa-angle-right"></i>
+                                    @endif
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
                         <a href="#delete_profile" data-tab="delete_profile"
                             class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                            aria-current="true">{{ trans('labels.delete_profile') }} <i
-                                class="fa-regular fa-angle-right"></i></a>
+                            aria-current="true">{{ trans('labels.delete_profile') }}
+                            <i
+                                class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                        </a>
                     @endif
                 </ul>
             </div>
@@ -472,7 +423,7 @@
                                                                 (,)</label>
                                                         </div>
                                                     </div>
-                                                    @if (Auth::user()->type == 1)
+                                                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                         <div class="form-group col-sm-6">
                                                             <label
                                                                 class="form-label">{{ trans('labels.primary_color') }}</label>
@@ -495,7 +446,7 @@
                                             <div class="form-group">
                                                 <div class="row">
 
-                                                    @if (Auth::user()->type == 1)
+                                                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                         <div class="form-group col-md-3 mb-0">
                                                             <label class="form-label"
                                                                 for="">{{ trans('labels.maintenance_mode') }}
@@ -566,7 +517,7 @@
                                                             @enderror
                                                         </div>
                                                     @endif
-                                                    @if (Auth::user()->type == 2 || Auth::user()->Type == 4)
+                                                    @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                                                         @if (@helper::checkaddons('customer_login'))
                                                             <div class="col-md-3">
                                                                 <label class="form-label"
@@ -1007,7 +958,7 @@
                                                 </select>
                                             </div>
 
-                                            @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                                            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                                                 @if (@helper::checkaddons('subscription'))
                                                     @if (@helper::checkaddons('notification'))
                                                         @php
@@ -1071,26 +1022,7 @@
                                                         </div>
                                                     @endif
                                                 @endif
-
-                                                <div class="form-group col-md-6 mb-0">
-                                                    <label class="form-label"
-                                                        for="">{{ trans('labels.maintenance_mode') }}
-                                                    </label>
-                                                    <input id="maintenance_mode-switch" type="checkbox"
-                                                        class="checkbox-switch" name="maintenance_mode" value="1"
-                                                        {{ $settingdata->maintenance_mode == 1 ? 'checked' : '' }}>
-                                                    <label for="maintenance_mode-switch" class="switch">
-                                                        <span
-                                                            class="{{ session()->get('direction') == 2 ? 'switch__circle-rtl' : 'switch__circle' }}"><span
-                                                                class="switch__circle-inner"></span></span>
-                                                        <span
-                                                            class="switch__left  {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">{{ trans('labels.off') }}</span>
-                                                        <span
-                                                            class="switch__right {{ session()->get('direction') == 2 ? 'ps-2' : 'pe-2' }}">{{ trans('labels.on') }}</span>
-                                                    </label>
-                                                </div>
-
-                                                <div class="col-md-6 form-group">
+                                                <div class="col-md-4 form-group">
                                                     <label class="form-label">{{ trans('labels.referral_amount') }}<span
                                                             class="text-danger"> * </span></label>
                                                     <input type="text" class="form-control w-10"
@@ -1110,28 +1042,24 @@
                                                         <small class="text-danger">{{ $message }}</small> <br>
                                                     @enderror
                                                 </div>
-                                                <!--<div class="form-group col-sm-4">-->
-                                                <!--    <label-->
-                                                <!--        class="form-label">{{ trans('labels.min_order_amount_for_free_shipping') }}</label>-->
-                                                <!--    <input type="text" class="form-control"-->
-                                                <!--        placeholder="{{ trans('labels.min_order_amount_for_free_shipping') }}"-->
-                                                <!--        name="min_order_amount_for_free_shipping"-->
-                                                <!--        value="{{ $settingdata->min_order_amount_for_free_shipping }}">-->
-                                                <!--    @error('min_order_amount_for_free_shipping')-->
-                                                <!--        <small class="text-danger">{{ $message }}</small> <br>-->
-                                                <!--    @enderror-->
-                                                <!--</div>-->
-                                                <!--<div class="form-group col-sm-4">-->
-                                                <!--    <label-->
-                                                <!--        class="form-label">{{ trans('labels.shipping_charges') }}</label>-->
-                                                <!--    <input type="text" class="form-control"-->
-                                                <!--        placeholder="{{ trans('labels.shipping_charges') }}"-->
-                                                <!--        name="shipping_charges"-->
-                                                <!--        value="{{ $settingdata->shipping_charges }}">-->
-                                                <!--    @error('shipping_charges')-->
-                                                <!--        <small class="text-danger">{{ $message }}</small> <br>-->
-                                                <!--    @enderror-->
-                                                <!--</div>-->
+
+                                                <div class="form-group col-md-4 mb-0">
+                                                    <label class="form-label"
+                                                        for="">{{ trans('labels.maintenance_mode') }}
+                                                    </label>
+                                                    <input id="maintenance_mode-switch" type="checkbox"
+                                                        class="checkbox-switch" name="maintenance_mode" value="1"
+                                                        {{ $settingdata->maintenance_mode == 1 ? 'checked' : '' }}>
+                                                    <label for="maintenance_mode-switch" class="switch">
+                                                        <span
+                                                            class="{{ session()->get('direction') == 2 ? 'switch__circle-rtl' : 'switch__circle' }}"><span
+                                                                class="switch__circle-inner"></span></span>
+                                                        <span
+                                                            class="switch__left  {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">{{ trans('labels.off') }}</span>
+                                                        <span
+                                                            class="switch__right {{ session()->get('direction') == 2 ? 'ps-2' : 'pe-2' }}">{{ trans('labels.on') }}</span>
+                                                    </label>
+                                                </div>
                                             @endif
 
 
@@ -1148,7 +1076,7 @@
                         </div>
                     </div>
                 </div>
-                @if (Auth::user()->type == 1)
+                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                     <div id="theme_images">
                         <div class="row mb-5">
                             <div class="col-12">
@@ -1242,7 +1170,7 @@
                                                 <img class="img-fluid rounded hw-70 mt-1"
                                                     src="{{ helper::image_Path(Auth::user()->image) }}" alt="">
                                             </div>
-                                            @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                                            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                                                 @if (@helper::checkaddons('unique_slug'))
                                                     <div class="form-group">
                                                         <label
@@ -1354,62 +1282,19 @@
                         </div>
                     </div>
                 </div>
-
-                @if (Auth::user()->type == 2 || Auth::user()->type == 4)
-                    @if (@helper::checkaddons('subscription'))
-                        @if (@helper::checkaddons('whatsapp_message'))
-                            @php
-                                $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
-                                    ->orderByDesc('id')
-                                    ->first();
-                                if ($user->allow_without_subscription == 1) {
-                                    $whatsapp_message = 1;
-                                } else {
-                                    $whatsapp_message = @$checkplan->whatsapp_message;
-                                }
-                            @endphp
-                            @if ($whatsapp_message == 1)
-                                @include('admin.included.whatsapp_message.setting_form')
-                            @endif
-                        @endif
-                    @else
-                        @if (@helper::checkaddons('whatsapp_message'))
-                            @include('admin.included.whatsapp_message.setting_form')
-                        @endif
-                    @endif
-                    @if (@helper::checkaddons('subscription'))
-                        @if (@helper::checkaddons('telegram_message'))
-                            @php
-                                $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
-                                    ->orderByDesc('id')
-                                    ->first();
-                                if ($user->allow_without_subscription == 1) {
-                                    $telegram_message = 1;
-                                } else {
-                                    $telegram_message = @$checkplan->telegram_message;
-                                }
-                            @endphp
-                            @if ($telegram_message == 1)
-                                @include('admin.telegram_message.setting_form')
-                            @endif
-                        @endif
-                    @else
-                        @if (@helper::checkaddons('telegram_message'))
-                            @include('admin.telegram_message.setting_form')
-                        @endif
-                    @endif
-
-                @endif
-                @if (Auth::user()->type == 1)
+                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                     @if (@helper::checkaddons('google_recaptcha'))
                         @include('admin.recaptcha.setting_form')
+                    @endif
+                    @if (@helper::checkaddons('whatsapp_message'))
+                        @include('admin.included.whatsapp_message.admin_setting_form')
                     @endif
                 @endif
                 @if (@helper::checkaddons('email_settings'))
                     @include('admin.email_settings.email_settings')
                     @include('admin.email_template.setting_form')
                 @endif
-                @if (Auth::user()->type == 1)
+                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                     @if (@helper::checkaddons('tawk_addons'))
                         @include('admin.tawk_settings.index')
                     @endif
@@ -1420,7 +1305,7 @@
                         @include('admin.wizz_chat_settings.index')
                     @endif
                 @endif
-                @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                     @if (@helper::checkaddons('google_login'))
                         <div id="google_login_settings">
                             @include('admin.sociallogin.google_login')
@@ -1492,7 +1377,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="text-end">
+                                                <div
+                                                    class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                                                     <button
                                                         @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" name="trusted_badges" value="1" @endif
                                                         class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_setting', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
@@ -1581,7 +1467,8 @@
                                                             value="{{ @$othersettingdata->safe_secure_checkout_text_color }}">
                                                     </div>
                                                 </div>
-                                                <div class="text-end">
+                                                <div
+                                                    class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                                                     <button
                                                         @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" name="safe_secure" value="1" @endif
                                                         class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_setting', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>

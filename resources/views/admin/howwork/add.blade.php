@@ -4,8 +4,10 @@
         <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.add_new') }}</h5>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb m-0">
-                <li class="breadcrumb-item"><a href="{{ URL::to('admin/how_it_works') }}">{{ trans('labels.how_it_works') }}</a></li>
-                <li class="breadcrumb-item active {{session()->get('direction') == 2 ? 'breadcrumb-rtl' : ''}}" aria-current="page">{{ trans('labels.add') }}</li>
+                <li class="breadcrumb-item"><a
+                        href="{{ URL::to('admin/how_it_works') }}">{{ trans('labels.how_it_works') }}</a></li>
+                <li class="breadcrumb-item active {{ session()->get('direction') == 2 ? 'breadcrumb-rtl' : '' }}"
+                    aria-current="page">{{ trans('labels.add') }}</li>
             </ol>
         </nav>
     </div>
@@ -19,9 +21,8 @@
                             <div class="form-group col-md-6">
                                 <label class="form-label">{{ trans('labels.title') }}<span class="text-danger"> *
                                     </span></label>
-                                <input type="text" class="form-control" name="title"
-                                    value="{{ old('title') }}" placeholder="{{ trans('labels.title') }}"
-                                    required>
+                                <input type="text" class="form-control" name="title" value="{{ old('title') }}"
+                                    placeholder="{{ trans('labels.title') }}" required>
                                 @error('title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -37,19 +38,20 @@
                             <div class="form-group">
                                 <label class="form-label">{{ trans('labels.description') }}<span class="text-danger"> *
                                     </span></label>
-                                    <textarea name="description" class="form-control" rows="5" placeholder="{{ trans('labels.description') }}" required></textarea>
+                                <textarea name="description" class="form-control" rows="5" placeholder="{{ trans('labels.description') }}"
+                                    required></textarea>
                                 @error('description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                           
+
                         </div>
-                        <div class="form-group {{session()->get('direction') == 2 ? 'text-start' : 'text-end'}}">
+                        <div class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                             <a href="{{ URL::to('admin/how_it_works') }}"
                                 class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
                             <button
                                 @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
-                                class="btn btn-primary px-sm-4 ">{{ trans('labels.save') }}</button>
+                                class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_how_it_works', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
                         </div>
                     </form>
                 </div>

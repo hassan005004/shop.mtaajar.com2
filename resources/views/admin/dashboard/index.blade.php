@@ -18,12 +18,12 @@
                     <div class="card border-0 box-shadow h-100">
                         <div class="card-body">
                             <div class="dashboard-card">
-                                @if (Auth::user()->type == 1)
+                                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                     <span class="card-icon">
                                         <i class="fa-regular fa-user fs-5"></i>
                                     </span>
                                     <span class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                        <p class="text-dark fs-15 fw-500 mb-1">{{ trans('labels.users') }}</p>
+                                        <p class="text-dark fs-15 fw-500 mb-1">{{ trans('labels.vendors') }}</p>
                                         <h5 class="text-primary fw-600">{{ $totalvendors }}</h4>
                                     </span>
                                 @else
@@ -47,7 +47,7 @@
                                     <i class="fa-regular fa-medal fs-5"></i>
                                 </span>
                                 <span class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                    @if (Auth::user()->type == 1)
+                                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                         <p class="text-dark fs-15 fw-500 mb-1">{{ trans('labels.pricing_plan') }}</p>
                                         <h5 class="text-primary fw-600">{{ $totalplans }}</h4>
                                         @else
@@ -72,7 +72,7 @@
                                 </span>
                                 <span class="{{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                                     <p class="text-dark fs-15 fw-500 mb-1">
-                                        {{ Auth::user()->type == 1 ? trans('labels.transactions') : trans('labels.orders') }}
+                                        {{ Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1) ? trans('labels.transactions') : trans('labels.orders') }}
                                     </p>
                                     <h5 class="text-primary fw-600">{{ $totalorders }}</h4>
                                 </span>
@@ -116,7 +116,7 @@
                                     role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-plus"></i> {{ trans('labels.quick_add') }}
                                 </a>
-                                @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                                     <ul class="dropdown-menu fw-500 fs-7 text-dark">
                                         <li><a class="dropdown-item py-2"
                                                 href="{{ URL::to('/admin/products') }}">{{ trans('labels.products') }}</a>
@@ -131,7 +131,7 @@
                                 @else
                                     <ul class="dropdown-menu fw-500 fs-7 text-dark">
                                         <li><a class="dropdown-item py-2"
-                                                href="{{ URL::to('admin/users') }}">{{ trans('labels.users') }}</a>
+                                                href="{{ URL::to('admin/users') }}">{{ trans('labels.vendors') }}</a>
                                         </li>
                                         <li><a class="dropdown-item py-2"
                                                 href="{{ URL::to('admin/plan') }}">{{ trans('labels.pricing_plan') }}
@@ -143,7 +143,7 @@
                                 @endif
                             </div>
                         </div>
-                        @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                        @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                             <div
                                 class="col-xxl-3 col-xl-4 mt-2 mt-sm-0 col-lg-3 col-md-3 col-sm-5 gap-2 d-flex flex-column justify-content-center align-items-center">
                                 <img src="https://qrcode.tec-it.com/API/QRCode?data={{ URL::to('/' . $user->slug) }}&choe=UTF-8"
@@ -159,7 +159,6 @@
                             </div>
                         @endif
                     </div>
-
                 </div>
             </div>
         </div>
@@ -195,8 +194,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
                         <h5 class="card-title m-0">
-                            @if (Auth::user()->type == 1)
-                                {{ trans('labels.users') }}
+                            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
+                                {{ trans('labels.vendors') }}
                             @else
                                 {{ trans('labels.orders') }}
                             @endif
@@ -221,7 +220,7 @@
             </div>
         </div>
     </div>
-    @if (Auth::user()->type != 1)
+    @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
         @php
             $ran = [
                 'gradient-1',
@@ -239,7 +238,7 @@
             <div class="col-xl-6">
                 <div class="card border-0 box-shadow h-100">
                     <div class="card-body">
-                        <h5 class="card-title pb-3 border-bottom">Top Products</h5>
+                        <h5 class="card-title pb-3 border-bottom">{{ trans('labels.top_products') }}</h5>
                         <div class="table-responsive" id="table-items">
                             <table class="table">
                                 <thead>
@@ -292,7 +291,7 @@
             <div class="col-xl-6">
                 <div class="card border-0 box-shadow h-100">
                     <div class="card-body">
-                        <h5 class="card-title pb-3 border-bottom">Top Customers</h5>
+                        <h5 class="card-title pb-3 border-bottom">{{ trans('labels.top_customers') }}</h5>
                         <div class="table-responsive" id="table-users">
                             <table class="table">
                                 <thead>
@@ -345,10 +344,10 @@
             <div class="card border-0 my-3">
                 <div class="card-body">
                     <h5 class="card-title text-capitalize mb-3 pb-3 border-bottom">
-                        {{ Auth::user()->type == 1 ? trans('labels.today_transaction') : trans('labels.today_orders') }}
+                        {{ Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1) ? trans('labels.today_transaction') : trans('labels.today_orders') }}
                     </h5>
                     <div class="table-responsive">
-                        @if (Auth::user()->type == 1)
+                        @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                             @include('admin.dashboard.admintransaction')
                         @else
                             @include('admin.orders.orderstable')
@@ -366,6 +365,8 @@
         var doughnut = null;
         var doughnutlabels = {{ Js::from($doughnutlabels) }};
         var doughnutdata = {{ Js::from($doughnutdata) }};
+        var secondary_color = '{{ @helper::appdata('')->secondary_color }}';
+        var secondary_color_light = 'color-mix(in srgb, {{ helper::appdata('')->secondary_color }}, transparent 65%)';
     </script>
     <!--- Admin ------ revenue-by-plans-chart-script --->
     <!--- vendorAdmin ------ revenue-by-orders-script --->

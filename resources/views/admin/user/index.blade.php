@@ -10,25 +10,28 @@
     @endphp
     <div class="d-flex justify-content-between flex-wrap gap-2 align-items-center">
 
-        <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.users') }}</h5>
+        <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.vendors') }}</h5>
 
         <div class="row g-2">
             @if (@helper::checkaddons('vendor_import'))
-            <div class="col-sm-auto col-6">
-                <a href="{{ URL::to('admin/users/import') }}" class="btn btn-secondary w-100 px-sm-4 d-flex gap-1 align-items-center justify-content-center">
-                <i class="fa-solid fa-file-import"></i>{{ trans('labels.import') }}</a>
-            </div>
+                <div class="col-sm-auto col-6">
+                    <a href="{{ URL::to('admin/users/import') }}"
+                        class="btn btn-secondary w-100 px-sm-4 d-flex gap-1 align-items-center justify-content-center {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
+                        <i class="fa-solid fa-file-import"></i>{{ trans('labels.import') }}</a>
+                </div>
 
                 @if ($getuserslist->count() > 0)
-                <div class="col-sm-auto col-6">
-                <a href="{{ URL::to('admin/users/exportvendor') }}" class="btn btn-secondary w-100 px-sm-4 d-flex gap-1 align-items-center justify-content-center">
-                <i class="fa-solid fa-file-export"></i>{{ trans('labels.export') }}</a>
-                </div>
+                    <div class="col-sm-auto col-6">
+                        <a href="{{ URL::to('admin/users/exportvendor') }}"
+                            class="btn btn-secondary w-100 px-sm-4 d-flex gap-1 align-items-center justify-content-center {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
+                            <i class="fa-solid fa-file-export"></i>{{ trans('labels.export') }}</a>
+                    </div>
                 @endif
             @endif
             <div class="col-sm-auto col-6">
-            <a href="{{ URL::to('admin/users/add') }}" class="btn btn-secondary px-sm-4 w-100 d-flex gap-1 align-items-center justify-content-center">
-                <i class="fa-regular fa-plus"></i>{{ trans('labels.add') }}</a>
+                <a href="{{ URL::to('admin/users/add') }}"
+                    class="btn btn-secondary px-sm-4 w-100 d-flex gap-1 align-items-center justify-content-center {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
+                    <i class="fa-regular fa-plus"></i>{{ trans('labels.add') }}</a>
             </div>
         </div>
     </div>
@@ -73,14 +76,14 @@
                                         </td>
                                         <td>
                                             @if ($user->is_available == '1')
-                                                <a class="btn btn-sm btn-outline-success hov" href="javascript::void(0)"
-                                                    tooltip="{{ trans('labels.active') }}"
+                                                <a class="btn btn-sm btn-outline-success hov {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                                    href="javascript::void(0)" tooltip="{{ trans('labels.active') }}"
                                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/users/status-' . $user->slug . '/2') }}')" @endif><i
                                                         class="fa-regular fa-check"></i>
                                                 </a>
                                             @else
-                                                <a class="btn btn-sm btn-outline-danger hov" href="javascript::void(0)"
-                                                    tooltip="{{ trans('labels.inactive') }}"
+                                                <a class="btn btn-sm btn-outline-danger hov {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
+                                                    href="javascript::void(0)" tooltip="{{ trans('labels.inactive') }}"
                                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/users/status-' . $user->slug . '/1') }}')" @endif><i
                                                         class="fa-regular fa-xmark "></i>
                                                 </a>
@@ -95,30 +98,35 @@
                                         <td>
                                             <div class="d-flex flex-wrap gap-2">
                                                 <a href="{{ URL::to('admin/users/edit-' . $user->slug) }}"
-                                                    tooltip="{{ trans('labels.edit') }}" class="btn btn-info hov btn-sm">
+                                                    tooltip="{{ trans('labels.edit') }}"
+                                                    class="btn btn-info hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </a>
                                                 <a class="btn btn-sm btn-dark" tooltip="{{ trans('labels.login') }}"
-                                                    href="{{ URL::to('/admin/users/login-' . $user->slug) }}"> <i
-                                                        class="fa-regular fa-arrow-right-to-bracket"></i> </a>
+                                                    href="{{ URL::to('/admin/users/login-' . $user->slug) }}">
+                                                    <i class="fa-regular fa-arrow-right-to-bracket"></i>
+                                                </a>
                                                 <a class="btn btn-sm btn-secondary hov"
                                                     tooltip="{{ trans('labels.view') }}"
-                                                    href="{{ URL::to('/' . $user->slug) }}" target="_blank"><i
-                                                        class="fa-regular fa-eye"></i></a>
+                                                    href="{{ URL::to('/' . $user->slug) }}" target="_blank">
+                                                    <i class="fa-regular fa-eye"></i></a>
                                                 <button type="button" id="btn_password{{ $user->id }}"
                                                     tooltip="{{ trans('labels.reset_password') }}"
                                                     onclick="myfunction({{ $user->id }})"
                                                     class="btn btn-sm btn-success hov" data-vendor_id="{{ $user->id }}"
-                                                    data-type="1"><i class="fa-light fa-key"></i></button>
+                                                    data-type="1"><i class="fa-light fa-key"></i>
+                                                </button>
                                                 <a href="javascript:void(0)" tooltip="{{ trans('labels.delete') }}"
                                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/users/delete-' . $user->slug) }}')" @endif
-                                                    class="btn btn-danger btn-sm hov">
-                                                    <i class="fa-regular fa-trash"></i></a>
+                                                    class="btn btn-danger btn-sm hov {{ Auth::user()->type == 4 ? (helper::check_access('role_vendors', Auth::user()->role_id, Auth::user()->vendor_id, 'delete') == 1 ? '' : 'd-none') : '' }}">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </a>
                                                 @if (@helper::checkaddons('store_clone'))
                                                     <a @if (env('Environment') == 'sendbox') onclick="myFunction()" @else href="{{ URL::to('admin/users/add-' . $user->id) }}" @endif
                                                         tooltip="{{ trans('labels.clone') }}"
                                                         class="btn btn-warning btn-sm hov">
-                                                        <i class="fa-regular fa-clone"></i></a>
+                                                        <i class="fa-regular fa-clone"></i>
+                                                    </a>
                                                 @endif
                                             </div>
                                         </td>

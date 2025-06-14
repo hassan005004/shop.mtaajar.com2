@@ -5,15 +5,16 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\helper\helper;
+use App\helper\whatsapp_helper;
 use App\Models\Cart;
 use App\Models\CustomStatus;
 use App\Models\Payment;
-use App\Models\Shippingarea;
 use App\Models\Order;
 use App\Models\OrderDetails;
 use App\Models\Settings;
 use App\Models\Products;
 use App\Models\Promocode;
+use App\Models\Shipping;
 use App\Models\Variation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -36,10 +37,9 @@ class CheckoutController extends Controller
         }
         // if the current host doesn't contain the website domain (meaning, custom domain)
         else {
-            $user = Settings::where('custom_domain', $host)->first();
-            $vendordata = User::where('id', $user->vendor_id)->first();
+            $vendordata = Settings::where('custom_domain', $host)->first();
 
-            $vdata = $vendordata->id;
+            $vdata = $vendordata->vendor_id;
         }
         if (empty($vendordata)) {
             abort(404);
@@ -160,7 +160,8 @@ class CheckoutController extends Controller
 
         $taxArr['tax'] = $tax_name;
         $taxArr['rate'] = $tax_price;
-        if (Auth::user()) {
+
+        if (Auth::user() && Auth::user()->type == 3) {
             if (helper::allpaymentcheckaddons($vendordata->id)) {
                 $getpaymentmethodslist = Payment::where('is_available', 1)->where('vendor_id', @$vdata)->where('is_activate', 1)->orderBy('reorder_id')->get();
             } else {
@@ -169,7 +170,7 @@ class CheckoutController extends Controller
         } else {
             $getpaymentmethodslist = Payment::where('is_available', 1)->where('vendor_id', @$vdata)->whereNotIn('payment_type', ['16'])->where('is_activate', 1)->orderBy('reorder_id')->get();
         }
-        $getshippingarealist = Shippingarea::where('vendor_id', @$vdata)->where('is_available', 1)->orderBy('reorder_id')->get();
+        $getshippingarealist = Shipping::where('vendor_id', $vdata)->where('is_available', 1)->orderBy('reorder_id')->get();
         return view('web.checkout.index', compact('vendordata', 'getcartlist', 'getpaymentmethodslist', 'getshippingarealist', 'itemtaxes', 'taxArr'));
     }
     public function ordersuccess(Request $request)
@@ -192,7 +193,16 @@ class CheckoutController extends Controller
         }
         $order_number = $request->order_number;
         $checkorderdata = Order::where('vendor_id', @$vdata)->where('order_number', $order_number)->first();
-        $whmessage = helper::whatsappmessage($order_number, $request->vendor_slug, $vendordata);
+        $whmessage = "";
+        if (@helper::checkaddons('whatsapp_message')) {
+            if (@whatsapp_helper::whatsapp_message_config($vendordata->id)->order_created == 1) {
+                if (whatsapp_helper::whatsapp_message_config($vendordata->id)->message_type == 1) {
+                    whatsapp_helper::whatsappmessage($order_number, $request->vendor_slug, $vendordata);
+                } else {
+                    $whmessage = whatsapp_helper::whatsappmessage($order_number, $request->vendor_slug, $vendordata);
+                }
+            }
+        }
         if (empty($checkorderdata)) {
             abort(404);
         }
@@ -293,7 +303,6 @@ class CheckoutController extends Controller
     }
     public function placeorder(Request $request)
     {
-
         try {
             $transaction_id = $request->transaction_id;
             $filename = "";
@@ -356,21 +365,11 @@ class CheckoutController extends Controller
 
             if ($request->modal_transaction_type == '6') {
                 if ($request->hasFile('screenshot')) {
-                    $validator = Validator::make($request->all(), [
-                        'screenshot' => 'image|mimes:jpg,jpeg,png',
-                    ], [
-                        'screenshot.mage' => trans('messages.enter_image_file'),
-                        'screenshot.mimes' => trans('messages.valid_image'),
-                    ]);
-                    if ($validator->fails()) {
-                        return redirect()->back()->withErrors($validator)->withInput();
-                    } else {
-                        $filename = 'screenshot-' . uniqid() . "." . $request->file('screenshot')->getClientOriginalExtension();
-                        $request->file('screenshot')->move(env('ASSETPATHURL') . 'admin-assets/images/screenshot/', $filename);
-                    }
+                    $filename = 'screenshot-' . uniqid() . "." . $request->file('screenshot')->getClientOriginalExtension();
+                    $request->file('screenshot')->move(env('ASSETPATHURL') . 'admin-assets/images/screenshot/', $filename);
                 }
                 $transaction_id = "";
-                $data = helper::createorder($request->modal_vendor_slug, "", $user_id, $request->modal_user_name, $request->modal_user_email, $request->modal_user_mobile, 6, $transaction_id, $request->modal_billing_address, $request->modal_billing_landmark, $request->modal_billing_postal_code, $request->modal_billing_city, $request->modal_billing_state, $request->modal_billing_country, $request->modal_shipping_address, $request->modal_shipping_landmark, $request->modal_shipping_postal_code, $request->modal_shipping_city, $request->modal_shipping_state, $request->modal_shipping_country, $request->modal_shipping_area, $request->modal_delivery_charge, $request->modal_grand_total, $request->modal_sub_total, $request->modal_tax, $request->modal_tax_name, $request->modal_notes, $request->modal_offer_code, $request->modal_offer_amount, $filename, $order_type);
+                $data = helper::createorder($request->modal_vendor_slug, "", $user_id, $request->modal_user_name, $request->modal_user_email, $request->modal_user_mobile, 6, $transaction_id, $request->modal_billing_address, $request->modal_billing_landmark, $request->modal_billing_postal_code, $request->modal_billing_city, $request->modal_billing_state, $request->modal_billing_country, $request->modal_shipping_address, $request->modal_shipping_landmark, $request->modal_shipping_postal_code, $request->modal_shipping_city, $request->modal_shipping_state, $request->modal_shipping_country, $request->modal_shipping_area, $request->modal_delivery_charge, $request->modal_grand_total, $request->modal_sub_total, $request->modal_tax, $request->modal_tax_name, $request->modal_notes, $request->modal_offer_code, $request->modal_offer_amount, $filename, $order_type, $request->modal_tips, $request->modal_buynow);
 
                 if ($data == false) {
                     return redirect()->back()->with('error', trans('messages.order_default_status_message'));
@@ -381,7 +380,7 @@ class CheckoutController extends Controller
 
                 return redirect($request->modal_vendor_slug . '/orders-success-' . $data['original']['order_number'])->with('success', trans('messages.success'));
             } else {
-                $data = helper::createorder($request->vendor_slug, "", $user_id, $user_name, $user_email, $user_mobile, $request->transaction_type, $transaction_id, $request->billing_address, $request->billing_landmark, $request->billing_postal_code, $request->billing_city, $request->billing_state, $request->billing_country, $request->shipping_address, $request->shipping_landmark, $request->shipping_postal_code, $request->shipping_city, $request->shipping_state, $request->shipping_country, $request->shipping_area, $request->delivery_charge, $request->grand_total, $request->sub_total, $request->tax_amount, $request->tax_name, $request->notes, $request->offer_code, $request->offer_amount, $filename, $order_type);
+                $data = helper::createorder($request->vendor_slug, "", $user_id, $user_name, $user_email, $user_mobile, $request->transaction_type, $transaction_id, $request->billing_address, $request->billing_landmark, $request->billing_postal_code, $request->billing_city, $request->billing_state, $request->billing_country, $request->shipping_address, $request->shipping_landmark, $request->shipping_postal_code, $request->shipping_city, $request->shipping_state, $request->shipping_country, $request->shipping_area, $request->delivery_charge, $request->grand_total, $request->sub_total, $request->tax_amount, $request->tax_name, $request->notes, $request->offer_code, $request->offer_amount, $filename, $order_type, $request->tips, $request->buynow);
                 $data = json_decode(json_encode($data), true);
 
                 if ($data == false) {
@@ -490,7 +489,7 @@ class CheckoutController extends Controller
                 $shipping_area = session()->get('mdata')['shipping_area'];
                 $delivery_charge = session()->get('mdata')['delivery_charge'];
 
-                $data = helper::createorder(session()->get('mdata')['vendor_slug'], "", $user_id, $user_name, $user_email, $user_mobile, session()->get('mdata')['transaction_type'], $paymentid, $billing_address, $billing_landmark, $billing_postal_code, $billing_city, $billing_state, $billing_country, $shipping_address, $shipping_landmark, $shipping_postal_code, $shipping_city, $shipping_state, $shipping_country, $shipping_area, $delivery_charge, session()->get('mdata')['grand_total'], session()->get('mdata')['sub_total'], session()->get('mdata')['tax_amount'], session()->get('mdata')['tax_name'], session()->get('mdata')['notes'], session()->get('mdata')['offer_code'], session()->get('mdata')['offer_amount'], '', $order_type);
+                $data = helper::createorder(session()->get('mdata')['vendor_slug'], "", $user_id, $user_name, $user_email, $user_mobile, session()->get('mdata')['transaction_type'], $paymentid, $billing_address, $billing_landmark, $billing_postal_code, $billing_city, $billing_state, $billing_country, $shipping_address, $shipping_landmark, $shipping_postal_code, $shipping_city, $shipping_state, $shipping_country, $shipping_area, $delivery_charge, session()->get('mdata')['grand_total'], session()->get('mdata')['sub_total'], session()->get('mdata')['tax_amount'], session()->get('mdata')['tax_name'], session()->get('mdata')['notes'], session()->get('mdata')['offer_code'], session()->get('mdata')['offer_amount'], '', $order_type, session()->get('mdata')['tips'], session()->get('mdata')['buynow']);
                 if ($data == false) {
                     return redirect()->back()->with('error', trans('order not placed without default status !!'));
                 }

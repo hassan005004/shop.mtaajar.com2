@@ -1,41 +1,47 @@
 @if (request()->is($vendordata->slug . '/products*'))
     @if (@helper::checkaddons('trusted_badges'))
-        <div class="col-12 p-3 border-top">
-            <div class="row g-3 product-detile">
-                @if(@helper::otherappdata($vendordata->id)->trusted_badge_image_1)
-                    <div class="col-xl-3 col-lg-6 col-6">
-                        <div class="service-content">
-                            <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_1) }}"
-                                alt="">
+        @if (
+            @helper::otherappdata($vendordata->id)->trusted_badge_image_1 != null ||
+                @helper::otherappdata($vendordata->id)->trusted_badge_image_2 != null ||
+                @helper::otherappdata($vendordata->id)->trusted_badge_image_3 != null ||
+                @helper::otherappdata($vendordata->id)->trusted_badge_image_4 != null)
+            <div class="col-12 p-3 border-top">
+                <div class="row g-3 product-detile">
+                    @if (@helper::otherappdata($vendordata->id)->trusted_badge_image_1 != null)
+                        <div class="col-xl-3 col-lg-6 col-6">
+                            <div class="service-content">
+                                <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_1) }}"
+                                    alt="">
+                            </div>
                         </div>
-                    </div>
-                @endif
-                @if(@helper::otherappdata($vendordata->id)->trusted_badge_image_2)
-                    <div class="col-xl-3 col-lg-6 col-6">
-                        <div class="service-content">
-                            <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_2) }}"
-                                alt="">
+                    @endif
+                    @if (@helper::otherappdata($vendordata->id)->trusted_badge_image_2 != null)
+                        <div class="col-xl-3 col-lg-6 col-6">
+                            <div class="service-content">
+                                <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_2) }}"
+                                    alt="">
+                            </div>
                         </div>
-                    </div>
-                @endif
-                @if(@helper::otherappdata($vendordata->id)->trusted_badge_image_3)
-                    <div class="col-xl-3 col-lg-6 col-6">
-                        <div class="service-content">
-                            <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_3) }}"
-                                alt="">
+                    @endif
+                    @if (@helper::otherappdata($vendordata->id)->trusted_badge_image_3 != null)
+                        <div class="col-xl-3 col-lg-6 col-6">
+                            <div class="service-content">
+                                <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_3) }}"
+                                    alt="">
+                            </div>
                         </div>
-                    </div>
-                @endif
-                @if(@helper::otherappdata($vendordata->id)->trusted_badge_image_4)
-                    <div class="col-xl-3 col-lg-6 col-6">
-                        <div class="service-content">
-                            <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_4) }}"
-                                alt="">
+                    @endif
+                    @if (@helper::otherappdata($vendordata->id)->trusted_badge_image_4 != null)
+                        <div class="col-xl-3 col-lg-6 col-6">
+                            <div class="service-content">
+                                <img src="{{ helper::image_path(@helper::otherappdata($vendordata->id)->trusted_badge_image_4) }}"
+                                    alt="">
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
-        </div>
+        @endif
     @endif
 @endif
 

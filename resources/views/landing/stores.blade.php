@@ -120,7 +120,7 @@
                     @foreach ($stores as $store)
                         <div class="col">
                             <a href="{{ URL::to('/' . $store->slug) }}" target="_blank">
-                                <div class="card rounded-2 h-100 overflow-hidden view-all-hover">
+                                {{-- <div class="card rounded-2 h-100 overflow-hidden view-all-hover">
                                     <img src="{{ helper::image_path(helper::appdata($store->id)->cover_image) }}"
                                         class="card-img-top rounded-0 object-fit-cover img-fluid object-fit-cover"
                                         alt="...">
@@ -131,6 +131,21 @@
                                         <p class="hotel-subtitle fs-8 text-muted">
                                             {{ helper::appdata($store->id)->footer_description }}
                                         </p>
+                                    </div>
+                                </div> --}}
+                                <div class="post-slide h-100 card border-0">
+                                    <div class="post-img rounded-3 overflow-hidden">
+                                        <span class="over-layer">
+                                        </span>
+                                        <img src="{{ helper::image_path(helper::appdata($store->id)->cover_image) }}" alt="">
+                                    </div>
+                                    <div class="card-body pt-3 p-0">
+                                        <p class="hotel-subtitle text-muted fs-7 mb-2">
+                                            {{ helper::appdata($store->id)->footer_description }}
+                                        </p>
+                                        <h3 class="fs-6 post-title text-capitalize fw-600 line-2 m-0">
+                                            {{ helper::appdata($store->id)->web_title }}
+                                        </h3>
                                     </div>
                                 </div>
                             </a>

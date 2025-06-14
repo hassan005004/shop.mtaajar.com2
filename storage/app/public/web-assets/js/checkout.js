@@ -32,7 +32,7 @@ if (document.getElementById("stripekey") && $("#stripekey").val() !== "") {
 
 // TO-MANAGE-PAYMENT-TYPE
 
-$("input:radio[name=transaction_type]").on("click", function (event) {
+$("input:radio[name=transaction_type]").on("click", function(event) {
   "use strict";
   if ($(this).val() == "3") {
     $("#card-element").removeClass("d-none");
@@ -41,15 +41,17 @@ $("input:radio[name=transaction_type]").on("click", function (event) {
   }
 });
 
-setTimeout(function () {
+setTimeout(function() {
   "use strict";
-  $("input:radio[name=transaction_type]:checked").on("click", function () {
-    if ($(this).val() == "3") {
-      $("#card-element").removeClass("d-none");
-    } else {
-      $("#card-element").addClass("d-none");
-    }
-  }).click();
+  $("input:radio[name=transaction_type]:checked")
+    .on("click", function() {
+      if ($(this).val() == "3") {
+        $("#card-element").removeClass("d-none");
+      } else {
+        $("#card-element").addClass("d-none");
+      }
+    })
+    .click();
 }, 2000);
 
 function randomdata() {
@@ -74,7 +76,7 @@ function randomdata() {
   $("#shipping_country , #billing_country").val("United States");
 }
 
-$(function () {
+$(function() {
   "use strict";
 
   if (env == "sandbox") {
@@ -103,7 +105,9 @@ function check_data_empty() {
 
   let check = 0;
 
-  $(".personal-info .form-control, .billing-info .form-control").each(function (index) {
+  $(
+    ".personal-info .form-control, .billing-info .form-control, .shipping-area-info .form-select"
+  ).each(function(index) {
     if ($(this).val() == "") {
       $(this).addClass("is-invalid").focus();
       check = 0;
@@ -126,15 +130,60 @@ function check_data_empty() {
       check = 1;
     }
   });
-  if (check == 1 && $(".shipping-area-info .form-select").find(":selected").val() == "") {
+
+  if (
+    check == 1 &&
+    $(".shipping-area-info .form-select").find(":selected").val() == ""
+  ) {
     $(".shipping-area-info .form-select").addClass("is-invalid").focus();
 
     check = 0;
 
     return false;
+  } else if (
+    check == 1 &&
+    $(".shipping-area-info .form-select").find(":selected").val() != ""
+  ) {
+    $(".shipping-area-info .form-select")
+      .removeClass("is-invalid")
+      .addClass("is-valid");
+
+    check = 1;
   }
 
   return check;
+}
+
+if (
+  parseFloat(min_order_amount_for_free_shipping) >
+  parseFloat($("#sub_total").val())
+) {
+  $("#shipping_area").on("change", function() {
+    "use strict";
+
+    let delivery_charge = parseFloat(
+      $(this).find(":selected").attr("data-delivery-charge")
+    );
+
+    $(".delivery_charge").html(currency_formate(delivery_charge));
+    let sub_total = parseFloat($("#sub_total").val());
+
+    if ($("#discount_amount").val() == "") {
+      var offer_amount = parseFloat(0);
+    } else {
+      var offer_amount = parseFloat($("#discount_amount").val());
+    }
+
+    let tax_amount = parseFloat($("#totaltax").val());
+
+    let grand_total = sub_total - offer_amount + tax_amount + delivery_charge;
+
+    $("#delivery_charge").val(delivery_charge);
+
+    $("#grand_total").val(grand_total);
+
+    $("#total_amount").text(currency_formate(grand_total));
+  });
 }
 
 function copyToClipboard(element) {
@@ -149,7 +198,7 @@ function copyToClipboard(element) {
     data: {
       code: element
     },
-    success: function (response) {
+    success: function(response) {
       if (response.status == 1) {
         $("#couponcode").val("");
         $("#couponcode").val(response.element);
@@ -160,44 +209,21 @@ function copyToClipboard(element) {
     }
   });
 }
-$("#shipping_area").on("change", function () {
-  "use strict";
 
-  $(".delivery-charge-section").removeClass("d-none");
-
-  let delivery_charge = parseFloat(
-    $(this).find(":selected").attr("data-delivery-charge")
-  );
-
-  $(".delivery_charge").html(currency_formate(delivery_charge));
-  let sub_total = parseFloat($("#sub_total").val());
-
-  let offer_amount = parseFloat($("#discount_amount").val());
-
-  let tax_amount = parseFloat($("#totaltax").val());
-
-  let grand_total = sub_total - offer_amount + tax_amount + delivery_charge;
-
-  $("#delivery_charge").val(delivery_charge);
-
-  $("#grand_total").val(grand_total);
-
-  $("#total_amount").text(currency_formate(grand_total));
-});
 // payment_type = COD : 1,RazorPay : 2, Stripe : 3, Flutterwave : 4, Paystack : 5, Mercado Pago : 7, PayPal : 8, MyFatoorah : 9, toyyibpay : 10
 function placeorder() {
+  $(".placeorder").prop("disabled", true);
+  $(".placeorder").html('<span class="loader"></span>');
   if (min_order_amount != null && min_order_amount != "") {
     if (parseInt(min_order_amount) > parseInt($("#sub_total").val())) {
-      showtoast("error", min_order_amount_msg + ' ' + min_order_amount);
+      showtoast("error", min_order_amount_msg + " " + min_order_amount);
       return false;
     }
   }
-  "use strict";
-  $('.placeorder').prop("disabled", true);
-  $('.placeorder').html('<span class="loader"></span>');
+  ("use strict");
   if (check_data_empty() == 0) {
-    $('.placeorder').prop("disabled", false);
-    $('.placeorder').html('Proceed To Pay');
+    $(".placeorder").prop("disabled", false);
+    $(".placeorder").html(proceed_pay);
     return false;
   }
   showloader();
@@ -212,11 +238,11 @@ function placeorder() {
     },
     method: "POST",
 
-    success: function (response) {
+    success: function(response) {
       if (response.status == 0) {
         hideloader();
-        $('.placeorder').prop("disabled", false);
-        $('.placeorder').html('Proceed To Pay');
+        $(".placeorder").prop("disabled", false);
+        $(".placeorder").html(proceed_pay);
         showtoast("error", response.message);
 
         return false;
@@ -229,7 +255,18 @@ function placeorder() {
           "input:radio[name=transaction_type]:checked"
         ).attr("data-currency");
 
-        var grand_total = $("#grand_total").val();
+        if (
+          $("#add_amount").val() != "" &&
+          $("#add_amount").val() != undefined
+        ) {
+          var tips = $("#add_amount").val();
+          var grand_total =
+            parseFloat($("#grand_total").val()) +
+            parseFloat($("#add_amount").val());
+        } else {
+          var tips = 0;
+          var grand_total = $("#grand_total").val();
+        }
 
         var user_name = $("#user_name").val();
 
@@ -252,29 +289,29 @@ function placeorder() {
 
         if (transaction_type == "2") {
           var options = {
-            "key": $('#razorpaykey').val(),
-            "amount": parseInt(grand_total * 100),
-            "name": title,
-            "description": description,
-            "image": 'https://badges.razorpay.com/badge-light.png',
-            "handler": function (response) {
+            key: $("#razorpaykey").val(),
+            amount: parseInt(grand_total * 100),
+            name: title,
+            description: description,
+            image: "https://badges.razorpay.com/badge-light.png",
+            handler: function(response) {
               callplaceorder(2, response.razorpay_payment_id);
             },
-            "modal": {
-              "ondismiss": function () {
-                $('.placeorder').prop("disabled", false);
-                $('.placeorder').html('Proceed To Pay');
+            modal: {
+              ondismiss: function() {
+                $(".placeorder").prop("disabled", false);
+                $(".placeorder").html(proceed_pay);
               }
             },
-            "prefill": {
+            prefill: {
               name: user_name,
 
               email: user_email,
 
               contact: user_mobile
             },
-            "theme": {
-              "color": "#366ed4"
+            theme: {
+              color: "#366ed4"
             }
           };
 
@@ -286,12 +323,12 @@ function placeorder() {
         // ------------------ Stripe ---------------------
 
         if (transaction_type == "3") {
-          stripe.createToken(card).then(function (result) {
+          stripe.createToken(card).then(function(result) {
             "use strict";
 
             if (result.error) {
-              $('.placeorder').prop("disabled", false);
-              $('.placeorder').html('Proceed To Pay');
+              $(".placeorder").prop("disabled", false);
+              $(".placeorder").html(proceed_pay);
               showtoast("error", result.error.message);
 
               return false;
@@ -323,13 +360,13 @@ function placeorder() {
               phone_number: user_mobile
             },
 
-            callback: function (response) {
+            callback: function(response) {
               callplaceorder(4, response.flw_ref);
             },
 
-            onclose: function () {
-              $('.placeorder').prop("disabled", false);
-              $('.placeorder').html('Proceed To Pay');
+            onclose: function() {
+              $(".placeorder").prop("disabled", false);
+              $(".placeorder").html(proceed_pay);
             },
 
             customizations: {
@@ -358,12 +395,12 @@ function placeorder() {
 
             label: "Paystack Order payment",
 
-            onClose: function () {
-              $('.placeorder').prop("disabled", false);
-              $('.placeorder').html('Proceed To Pay');
+            onClose: function() {
+              $(".placeorder").prop("disabled", false);
+              $(".placeorder").html(proceed_pay);
             },
 
-            callback: function (response) {
+            callback: function(response) {
               callplaceorder(5, response.trxref);
             }
           });
@@ -419,8 +456,7 @@ function placeorder() {
 
         // Banktransfer
         if (transaction_type == "6") {
-          $("#modalbankdetails").modal("show");
-          $('#modal_payment_description').html($('#payment_description').val())
+          $("#modal_payment_description").html($("#payment_description").val());
           $("#modal_vendor_slug").val(vendorslug);
           $("#modal_user_name").val($("#user_name").val());
           $("#modal_user_name").val($("#user_name").val());
@@ -438,9 +474,12 @@ function placeorder() {
           $("#modal_shipping_city").val($("#shipping_city").val());
           $("#modal_shipping_state").val($("#shipping_state").val());
           $("#modal_shipping_country").val($("#shipping_country").val());
-          $("#modal_shipping_area").val($("#shipping_area").find(":selected").attr("data-area-name"));
+          $("#modal_shipping_area").val(
+            $("#shipping_area").find(":selected").attr("data-area-name")
+          );
           $("#modal_delivery_charge").val($("#delivery_charge").val());
-          $("#modal_grand_total").val($("#grand_total").val());
+          $("#modal_grand_total").val(grand_total);
+          $("#modal_tips").val(tips);
           $("#modal_sub_total").val($("#sub_total").val());
           $("#modal_tax").val($("#tax_amount").val());
           $("#modal_tax_name").val($("#tax_name").val());
@@ -448,19 +487,19 @@ function placeorder() {
           $("#modal_offer_code").val($("#couponcode").val());
           $("#modal_offer_amount").val($("#discount_amount").val());
           $("#modal_transaction_type").val(transaction_type);
-          $("#modal_product_price").val($('#product_price').val());
-          $("#modalbankdetails").on('hidden.bs.modal', function (e) {
-            $('.placeorder').prop("disabled", false);
-            $('.placeorder').html('Proceed To Pay');
+          $("#modal_buynow").val($("#buynow").val());
+          $("#modalbankdetails").modal("show");
+          $("#modalbankdetails").on("hidden.bs.modal", function(e) {
+            $(".placeorder").prop("disabled", false);
+            $(".placeorder").html(proceed_pay);
           });
         }
       }
-
     },
-    error: function (error) {
+    error: function(error) {
       hideloader();
-      $('.placeorder').prop("disabled", false);
-      $('.placeorder').html('Proceed To Pay');
+      $(".placeorder").prop("disabled", false);
+      $(".placeorder").html(proceed_pay);
       "error", wrong;
 
       return false;
@@ -504,11 +543,24 @@ function callplaceorder(transaction_type, transaction_id) {
 
   data["shipping_country"] = $("#shipping_country").val();
 
-  data["delivery_charge"] = parseFloat($("#delivery_charge").val());
-  
-  data["shipping_area"] = $("#shipping_area").find(":selected").attr("data-area-name");
+  data["shipping_area"] = $("#shipping_area")
+    .find(":selected")
+    .attr("data-area-name");
 
-  data["grand_total"] = $("#grand_total").val();
+  data["delivery_charge"] = parseFloat($("#delivery_charge").val());
+
+  if ($("#add_amount").val() != "" && $("#add_amount").val() != undefined) {
+    var tips = $("#add_amount").val();
+    var grand_total =
+      parseFloat($("#grand_total").val()) + parseFloat($("#add_amount").val());
+  } else {
+    var tips = 0;
+    var grand_total = $("#grand_total").val();
+  }
+
+  data["grand_total"] = grand_total;
+
+  data["tips"] = tips;
 
   data["sub_total"] = $("#sub_total").val();
 
@@ -529,7 +581,8 @@ function callplaceorder(transaction_type, transaction_id) {
   data["successurl"] = successurl;
 
   data["failure"] = failure;
-  data["product_price"] = $('#product_price').val();
+
+  data["buynow"] = $("#buynow").val();
 
   data["return"] = 1;
 
@@ -580,7 +633,7 @@ function callplaceorder(transaction_type, transaction_id) {
 
     method: "POST",
 
-    success: function (response) {
+    success: function(response) {
       if (response.status == 1) {
         if (
           transaction_type != "7" &&
@@ -594,29 +647,27 @@ function callplaceorder(transaction_type, transaction_id) {
           transaction_type != "15"
         ) {
           location.href = ordersuccess + response.order_number;
-        }
-        else {
+        } else {
           if (transaction_type == 8) {
-            $(".callpaypal").trigger("click")
+            $(".callpaypal").trigger("click");
           } else {
             location.href = response.redirecturl;
           }
         }
-
       } else {
         hideloader();
-        $('.placeorder').prop("disabled", false);
-        $('.placeorder').html('Proceed To Pay');
+        $(".placeorder").prop("disabled", false);
+        $(".placeorder").html(proceed_pay);
         showtoast("error", response.message);
 
         return false;
       }
     },
 
-    error: function (error) {
+    error: function(error) {
       hideloader();
-      $('.placeorder').prop("disabled", false);
-      $('.placeorder').html('Proceed To Pay');
+      $(".placeorder").prop("disabled", false);
+      $(".placeorder").html(proceed_pay);
       "error", wrong;
 
       return false;

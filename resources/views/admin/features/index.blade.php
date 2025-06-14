@@ -5,7 +5,8 @@
 
         <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.features') }}</h5>
 
-        <a href="{{ URL::to('admin/features/add') }}" class="btn btn-secondary px-sm-4 text-capitalize d-flex">
+        <a href="{{ URL::to('admin/features/add') }}"
+            class="btn btn-secondary px-sm-4 text-capitalize d-flex {{ Auth::user()->type == 4 ? (helper::check_access('role_features', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">
 
             <i class="fa-regular fa-plus mx-1"></i>{{ trans('labels.add') }}
 
@@ -78,13 +79,15 @@
                                             <div class="d-flex gap-2">
                                                 <a href="{{ URL::to('/admin/features/edit-' . $feature->id) }}"
                                                     tooltip="{{ trans('labels.edit') }}"
-                                                    class="btn btn-info hov btn-sm "> <i
-                                                        class="fa-regular fa-pen-to-square"></i></a>
+                                                    class="btn btn-info hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_features', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </a>
 
                                                 <a href="javascript:void(0)" tooltip="{{ trans('labels.delete') }}"
                                                     @if (env('Environment') == 'sendbox') onclick="myFunction()" @else onclick="statusupdate('{{ URL::to('admin/features/delete-' . $feature->id) }}')" @endif
-                                                    class="btn btn-danger hov btn-sm">
-                                                    <i class="fa-regular fa-trash"></i></a>
+                                                    class="btn btn-danger hov btn-sm {{ Auth::user()->type == 4 ? (helper::check_access('role_features', Auth::user()->role_id, Auth::user()->vendor_id, 'delete') == 1 ? '' : 'd-none') : '' }}">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </a>
                                             </div>
 
                                         </td>

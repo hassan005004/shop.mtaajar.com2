@@ -54,7 +54,7 @@
                                 class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
                             <button
                                 @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
-                                class="btn btn-primary px-sm-4 ">{{ trans('labels.save') }}</button>
+                                class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_promotional_banners', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
                         </div>
                     </form>
                 </div>

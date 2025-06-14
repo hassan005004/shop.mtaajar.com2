@@ -159,22 +159,47 @@
     <div class="table-section bill-tbl w-100 mt-10">
         <table class="table w-100 mt-10">
             <tr>
-                <th class="w-50">{{ trans('labels.payment') }}</th>
+                @if ($getorderdata->tips > 0)
+                    <th class="w-50">{{ trans('labels.payment') }}</th>
+                    <th class="w-50">{{ trans('labels.tips') }}</th>
+                @else
+                    <th class="w-100">{{ trans('labels.payment') }}</th>
+                @endif
             </tr>
             <tr>
-                <td>
-                    @if ($getorderdata->transaction_type == 0)
-                        {{ trans('labels.online') }}
-                    @elseif ($getorderdata->transaction_type == 6)
-                        {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
-                        : <small><a href="{{ helper::image_path($getorderdata->screenshot) }}" target="_blank"
-                                class="text-danger">{{ trans('labels.click_here') }}</a></small>
-                    @else
-                        {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
-                        - {{ $getorderdata->transaction_id }}
-                    @endif
-
-                </td>
+                @if ($getorderdata->tips > 0)
+                    <td>
+                        @if ($getorderdata->transaction_type == 0)
+                            {{ trans('labels.online') }}
+                        @elseif ($getorderdata->transaction_type == 6)
+                            {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
+                            : <small><a href="{{ helper::image_path($getorderdata->screenshot) }}" target="_blank"
+                                    class="text-danger">{{ trans('labels.click_here') }}</a></small>
+                        @else
+                            {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
+                            - {{ $getorderdata->transaction_id }}
+                        @endif
+                    </td>
+                    <td>
+                        <p class="fs-6 d-flex w-100 justify-content-between align-items-center">
+                            {{ trans('labels.tips_pro') }} :
+                            <small>{{ helper::currency_formate($getorderdata->tips, $getorderdata->vendor_id) }}</small>
+                        </p>
+                    </td>
+                @else
+                    <td>
+                        @if ($getorderdata->transaction_type == 0)
+                            {{ trans('labels.online') }}
+                        @elseif ($getorderdata->transaction_type == 6)
+                            {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
+                            : <small><a href="{{ helper::image_path($getorderdata->screenshot) }}" target="_blank"
+                                    class="text-danger">{{ trans('labels.click_here') }}</a></small>
+                        @else
+                            {{ @helper::getpayment($getorderdata->transaction_type, $getorderdata->vendor_id)->payment_name }}
+                            - {{ $getorderdata->transaction_id }}
+                        @endif
+                    </td>
+                @endif
             </tr>
         </table>
     </div>
@@ -232,12 +257,12 @@
                 </tr>
             @endforeach
             <tr>
-                <td colspan="7">
+                <td colspan="4">
                     <div class="total-part">
                         <div class="total-left w-85 float-left" align="right">
                             <p>{{ trans('labels.sub_total') }}</p>
                             @if ($getorderdata->offer_amount > 0)
-                                <p><strong>{{ trans('labels.discount') }}</strong>{{ $getorderdata->offer_code != '' ? '(' . $getorderdata->offer_code . ')' : '' }}
+                                <p>{{ trans('labels.discount') }}{{ $getorderdata->offer_code != '' ? '(' . $getorderdata->offer_code . ')' : '' }}
                                 </p>
                             @endif
                             @php
@@ -252,7 +277,11 @@
 
 
                             @if ($getorderdata->order_type == 1)
-                                <p> <strong>{{ trans('labels.delivery_charge') }}({{ $getorderdata->shipping_area }})</strong></p>
+                                <p>{{ trans('labels.delivery') }}
+                                    @if ($getorderdata->shipping_area != '')
+                                        ({{ $getorderdata->shipping_area }})
+                                    @endif
+                                </p>
                             @endif
                             <p>{{ trans('labels.grand_total') }}</p>
                         </div>
@@ -273,7 +302,14 @@
                             </p>
 
                             @if ($getorderdata->order_type == 1)
-                                <p> <strong>{{ helper::currency_formate($getorderdata->delivery_charge, $getorderdata->vendor_id) }}</strong>
+                                <p>
+                                    <strong>
+                                        @if ($getorderdata->delivery_charge > 0)
+                                            {{ helper::currency_formate($getorderdata->delivery_charge, $getorderdata->vendor_id) }}
+                                        @else
+                                            {{ trans('labels.free') }}
+                                        @endif
+                                    </strong>
                                 </p>
                             @endif
                             <p><strong>{{ helper::currency_formate($getorderdata->grand_total, $getorderdata->vendor_id) }}</strong>

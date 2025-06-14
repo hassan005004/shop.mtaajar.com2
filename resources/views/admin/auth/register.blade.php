@@ -17,16 +17,18 @@
                             <!-- FOR SMALL DEVICE TOP CATEGORIES -->
                             @if (@helper::checkaddons('language'))
                                 <div class="lag-btn dropdown border-0 shadow-none login-lang">
-                                    <button class="btn dropdown-toggle border-0 language-dropdown" type="button"
+                                    <button class="border-0 bg-transparent language-dropdown" type="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-globe fs-5 text-dark"></i>
+                                        <img src="{{ helper::image_path(session()->get('flag')) }}" alt=""
+                                            class="lag-img rounded-circle w-25">
                                     </button>
-                                    <ul class="dropdown-menu rounded-1 p-0 rounded-3 overflow-hidden">
+                                    <ul
+                                        class="dropdown-menu rounded-1 p-0 mt-1 bg-body-secondary shadow border-0 rounded-3 overflow-hidden">
                                         @foreach (helper::listoflanguage() as $languagelist)
-                                            <li><a class="dropdown-item text-dark d-flex align-items-center text-left px-3 py-2"
+                                            <li><a class="dropdown-item text-dark d-flex align-items-center text-left px-2 gap-2 py-2"
                                                     href="{{ URL::to('/lang/change?lang=' . $languagelist->code) }}">
                                                     <img src="{{ helper::image_path($languagelist->image) }}" alt=""
-                                                        class="img-fluid lag-img mx-1 w-25">
+                                                        class="img-fluid lag-img w-25">
                                                     &nbsp;&nbsp;{{ $languagelist->name }}
                                                 </a>
                                             </li>

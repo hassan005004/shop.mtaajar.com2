@@ -319,50 +319,61 @@
             </table>
 
             <div class="col-12 d-flex mb-2 justify-content-end">
-                <div class="col-12">
-                    <div class="text-dark">
-                        @php
-                            $tax = explode('|', $getorderdata->tax_amount);
-                            $tax_name = explode('|', $getorderdata->tax_name);
-                        @endphp
-                        @if ($getorderdata->tax_amount != null && $getorderdata->tax_amount != '')
-                            @foreach ($tax as $key => $tax_value)
+                <div class="col-7">
+                    <div class="col-12">
+                        <div class="text-dark">
+                            @php
+                                $tax = explode('|', $getorderdata->tax_amount);
+                                $tax_name = explode('|', $getorderdata->tax_name);
+                            @endphp
+                            @if ($getorderdata->tax_amount != null && $getorderdata->tax_amount != '')
+                                @foreach ($tax as $key => $tax_value)
+                                    <div class="d-flex justify-content-between text-dark my-1">
+                                        <div class="">
+                                            <span
+                                                class="txt-resept-font-size fw-500 text-uppercase line-1">{{ $tax_name[$key] }}</span>
+                                        </div>
+                                        <div class="">
+                                            <span
+                                                class="txt-resept-font-size fw-500 text-uppercase line-1 text-end">{{ @(float) $tax[$key] }}</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+
+                            <div class="d-flex justify-content-between text-dark my-1">
+                                <div class="">
+                                    <span class="txt-resept-font-size fw-500 text-uppercase line-1">
+                                        {{ trans('labels.discount') }}
+                                    </span>
+                                </div>
+                                <div class="">
+                                    <span class="txt-resept-font-size fw-500 text-uppercase text-end line-1">
+                                        {{ $getorderdata->offer_amount }}
+                                    </span>
+                                </div>
+                            </div>
+                            @if ($getorderdata->order_type == 1)
                                 <div class="d-flex justify-content-between text-dark my-1">
                                     <div class="">
-                                        <span
-                                            class="txt-resept-font-size fw-500 text-uppercase line-1">{{ $tax_name[$key] }}</span>
+                                        <span class="txt-resept-font-size fw-500 text-uppercase line-1">
+                                            {{ trans('labels.delivery') }}
+                                            @if ($getorderdata->shipping_area != '')
+                                                ({{ $getorderdata->shipping_area }})
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="">
-                                        <span
-                                            class="txt-resept-font-size fw-500 text-uppercase line-1 text-end">{{ @(float) $tax[$key] }}</span>
+                                        <span class="txt-resept-font-size fw-500 text-uppercase line-1 text-end">
+                                            @if ($getorderdata->delivery_charge > 0)
+                                                {{ $getorderdata->delivery_charge }}
+                                            @else
+                                                {{ trans('labels.free') }}
+                                            @endif
+                                        </span>
                                     </div>
                                 </div>
-                            @endforeach
-                        @endif
-
-                        <div class="d-flex justify-content-between text-dark my-1">
-                            <div class="">
-                                <span class="txt-resept-font-size fw-500 text-uppercase line-1">
-                                    {{ trans('labels.discount') }}
-                                </span>
-                            </div>
-                            <div class="">
-                                <span class="txt-resept-font-size fw-500 text-uppercase text-end line-1">
-                                    {{ $getorderdata->offer_amount }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between text-dark my-1">
-                            <div class="">
-                                <span class="txt-resept-font-size fw-500 text-uppercase line-1">
-                                    {{ trans('labels.delivery_charge') }}({{ $getorderdata->shipping_area }})
-                                </span>
-                            </div>
-                            <div class="">
-                                <span class="txt-resept-font-size fw-500 text-uppercase line-1 text-end">
-                                    {{ $getorderdata->delivery_charge }}
-                                </span>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -374,6 +385,12 @@
                     {{ $subtotal - $getorderdata->offer_amount + $getorderdata->delivery_charge + array_sum($tax) }}
                 </span>
             </div>
+            @if ($getorderdata->tips > 0)
+                <div class="col-12 d-flex justify-content-between py-2">
+                    <span class="fw-semibold product-text-size line-1">{{ trans('labels.tips') }}</span>
+                    <span class="fw-semibold line-1 product-text-size">{{ $getorderdata->tips }}</span>
+                </div>
+            @endif
             <h2 class="my-2 fs-8 fw-600 text-center line-1">{{ trans('labels.thank_you_note') }}</h2>
             <div class="col-12 mt-2 d-flex justify-content-center">
                 <button type='button' id="btnPrint"

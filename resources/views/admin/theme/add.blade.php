@@ -4,8 +4,10 @@
         <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.add_new') }}</h5>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb m-0">
-                <li class="breadcrumb-item"><a href="{{ URL::to('admin/themes') }}">{{ trans('labels.theme_images') }}</a></li>
-                <li class="breadcrumb-item active {{session()->get('direction') == 2 ? 'breadcrumb-rtl' : ''}}" aria-current="page">{{ trans('labels.add') }}</li>
+                <li class="breadcrumb-item"><a href="{{ URL::to('admin/themes') }}">{{ trans('labels.theme_images') }}</a>
+                </li>
+                <li class="breadcrumb-item active {{ session()->get('direction') == 2 ? 'breadcrumb-rtl' : '' }}"
+                    aria-current="page">{{ trans('labels.add') }}</li>
             </ol>
         </nav>
     </div>
@@ -19,9 +21,8 @@
                             <div class="form-group col-md-6">
                                 <label class="form-label">{{ trans('labels.name') }}<span class="text-danger"> *
                                     </span></label>
-                                <input type="text" class="form-control" name="name"
-                                    value="{{ old('name') }}" placeholder="{{ trans('labels.name') }}"
-                                    required>
+                                <input type="text" class="form-control" name="name" value="{{ old('name') }}"
+                                    placeholder="{{ trans('labels.name') }}" required>
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -35,12 +36,12 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group {{session()->get('direction') == 2 ? 'text-start' : 'text-end'}}">
+                        <div class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                             <a href="{{ URL::to('admin/themes') }}"
                                 class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
                             <button
                                 @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
-                                class="btn btn-primary px-sm-4 ">{{ trans('labels.save') }}</button>
+                                class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_theme_images', Auth::user()->role_id, Auth::user()->vendor_id, 'add') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
                         </div>
                     </form>
                 </div>

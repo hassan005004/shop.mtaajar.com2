@@ -13,7 +13,7 @@
             <form action="{{ URL::to('/admin/transaction') }} " class="col-xl-7 col-md-9 col-12" method="get">
                 <div class="row">
                     <div class="input-group gap-2 justify-content-end">
-                        @if (Auth::user()->type == 1)
+                        @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                             <select class="form-select transaction-select col-sm-auto col-12 rounded" name="vendor">
                                 <option value=""
                                     data-value="{{ URL::to('/admin/transaction?vendor=' . '&startdate=' . request()->get('startdate') . '&enddate=' . request()->get('enddate')) }}"
@@ -35,7 +35,8 @@
                                 value="{{ request()->get('enddate') }}">
                         </div>
                         <div class="input-group-append col-sm-auto col-12">
-                            <button class="btn btn-primary px-sm-4 rounded w-100" type="submit">{{ trans('labels.fetch') }}</button>
+                            <button class="btn btn-primary px-sm-4 rounded w-100"
+                                type="submit">{{ trans('labels.fetch') }}</button>
                         </div>
                     </div>
                 </div>
@@ -51,7 +52,7 @@
                                     <td>{{ trans('labels.srno') }}</td>
                                     <td>{{ trans('labels.transaction_number') }}</td>
                                     <td>{{ trans('labels.plan_name') }}</td>
-                                    <td>{{trans('labels.total')}} {{ trans('labels.amount') }}</td>
+                                    <td>{{ trans('labels.total') }} {{ trans('labels.amount') }}</td>
                                     <td>{{ trans('labels.payment_type') }}</td>
                                     <td>{{ trans('labels.purchase_date') }}</td>
                                     <td>{{ trans('labels.expire_date') }}</td>
@@ -62,14 +63,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    
-                                    $i = 1;
-                                    
-                                @endphp
-                                @foreach ($transaction as $transaction)
+                                @foreach ($transaction as $key => $transaction)
                                     <tr class="fs-7 align-middle">
-                                        <td>@php echo $i++; @endphp</td>
+                                        <td>{{ ++$key }}</td>
                                         <td>#{{ $transaction->transaction_number }}</td>
                                         <td>{{ @$transaction['plan_info']->name }}</td>
                                         <td>{{ helper::currency_formate($transaction->grand_total, '') }}</td>
@@ -90,26 +86,26 @@
                                             @if ($transaction->payment_type == 6 || $transaction->payment_type == 1)
                                                 @if ($transaction->status == 2)
                                                     <span
-                                                        class="badge bg-success">{{ helper::date_formate($transaction->purchase_date,$transaction->vendor_id) }}</span>
+                                                        class="badge bg-success">{{ @helper::date_formate($transaction->purchase_date, $vendor_id) }}</span>
                                                 @else
                                                     -
                                                 @endif
                                             @else
                                                 <span
-                                                    class="badge bg-success">{{ helper::date_formate($transaction->purchase_date,$transaction->vendor_id) }}</span>
+                                                    class="badge bg-success">{{ @helper::date_formate($transaction->purchase_date, $vendor_id) }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($transaction->payment_type == 6 || $transaction->payment_type == 1)
                                                 @if ($transaction->status == 2)
                                                     <span
-                                                        class="badge bg-danger">{{ $transaction->expire_date != '' ? helper::date_formate($transaction->expire_date,$transaction->vendor_id) : '-' }}</span>
+                                                        class="badge bg-danger">{{ $transaction->expire_date != '' ? @helper::date_formate($transaction->expire_date, $vendor_id) : '-' }}</span>
                                                 @else
                                                     -
                                                 @endif
                                             @else
                                                 <span
-                                                    class="badge bg-danger">{{ $transaction->expire_date != '' ? helper::date_formate($transaction->expire_date,$transaction->vendor_id) : '-' }}</span>
+                                                    class="badge bg-danger">{{ $transaction->expire_date != '' ? @helper::date_formate($transaction->expire_date, $vendor_id) : '-' }}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -127,32 +123,36 @@
                                                 -
                                             @endif
                                         </td>
-                                        <td>{{ helper::date_formate($transaction->created_at, $transaction->vendor_id) }}<br>
-                                            {{ helper::time_formate($transaction->created_at, $transaction->vendor_id) }}
-                                   </td>
-                                    <td>{{ helper::date_formate($transaction->updated_at, $transaction->vendor_id) }}<br>
-                                          {{ helper::time_formate($transaction->updated_at, $transaction->vendor_id) }}
-                                   </td>
+                                        <td>{{ @helper::date_formate($transaction->created_at, $vendor_id) }}<br>
+                                            {{ @helper::time_formate($transaction->created_at, $vendor_id) }}
+                                        </td>
+                                        <td>{{ @helper::date_formate($transaction->updated_at, $vendor_id) }}<br>
+                                            {{ @helper::time_formate($transaction->updated_at, $vendor_id) }}
+                                        </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                @if (Auth::user()->type == '1')
+                                                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                     @if ($transaction->payment_type == 6 || $transaction->payment_type == 1)
                                                         @if ($transaction->status == 1)
                                                             <a class="btn btn-sm btn-success hov"
                                                                 tooltip="{{ trans('labels.active') }}"
-                                                                @if (env('Environment') == 'sendbox') onclick="myFunction()" @else  onclick="statusupdate('{{ URL::to('admin/transaction-' . $transaction->id . '-2') }}')" @endif><i
-                                                                    class="fas fa-check"></i></a>
+                                                                @if (env('Environment') == 'sendbox') onclick="myFunction()" @else  onclick="statusupdate('{{ URL::to('admin/transaction-' . $transaction->id . '-2') }}')" @endif>
+                                                                <i class="fas fa-check"></i>
+                                                            </a>
                                                             <a class="btn btn-sm btn-danger hov"
-                                                                tooltip="{{ trans('labels.inactive') }}"  @if (env('Environment') == 'sendbox') onclick="myFunction()" @else 
-                                                                onclick="statusupdate('{{ URL::to('admin/transaction-' . $transaction->id . '-3') }}')" @endif><i
-                                                                    class="fas fa-close"></i></a>
+                                                                tooltip="{{ trans('labels.inactive') }}"
+                                                                @if (env('Environment') == 'sendbox') onclick="myFunction()" @else 
+                                                                onclick="statusupdate('{{ URL::to('admin/transaction-' . $transaction->id . '-3') }}')" @endif>
+                                                                <i class="fas fa-close"></i>
+                                                            </a>
                                                         @endif
                                                     @endif
                                                 @endif
                                                 <a class="btn btn-sm hov btn-secondary hov"
                                                     tooltip="{{ trans('labels.view') }}"
-                                                    href="{{ URL::to('admin/transaction/plandetails-' . $transaction->id) }}"><i
-                                                        class="fa-regular fa-eye"></i></a>
+                                                    href="{{ URL::to('admin/transaction/plandetails-' . $transaction->id) }}">
+                                                    <i class="fa-regular fa-eye"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>

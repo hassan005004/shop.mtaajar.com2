@@ -44,7 +44,8 @@
                             <tbody id="tabledetails" data-url="{{ url('admin/products/reorder_category') }}">
                                 @php $i = 1; @endphp
                                 @foreach ($getproductslist as $product)
-                                    <tr class="fs-7 align-middle row1" id="dataid{{ $product->id }}" data-id="{{ $product->id }}">
+                                    <tr class="fs-7 align-middle row1" id="dataid{{ $product->id }}"
+                                        data-id="{{ $product->id }}">
                                         <td><a tooltip="{{ trans('labels.move') }}"><i
                                                     class="fa-light fa-up-down-left-right mx-2"></i></a></td>
                                         <td>@php echo $i++; @endphp</td>
@@ -57,7 +58,7 @@
                                                     class="img-fluid rounded hw-50" alt="">
                                             @endif
                                         </td>
-                                        <td>{{@$product['category_info']->name}}</td>
+                                        <td>{{ @$product['category_info']->name }}</td>
                                         <td>{{ $product->name }} <br>
                                             @if ($product->view_count > 0)
                                                 <span class="badge bg-success"><i class="fa-solid fa-eye"></i>
@@ -73,13 +74,10 @@
                                         </td>
                                         <td>
                                             @if ($product->has_variation == 1)
-                                                
-                                                    <span
-                                                        class="badge bg-info">{{ trans('labels.in_variants') }}</span><br>
-                                                    @if (helper::checklowqty($product->id, $product->vendor_id) == 1)
-                                                        <span class="badge bg-warning">{{ trans('labels.low_qty') }}</span>
-                                                    @endif
-                                                
+                                                <span class="badge bg-info">{{ trans('labels.in_variants') }}</span><br>
+                                                @if (helper::checklowqty($product->id, $product->vendor_id) == 1)
+                                                    <span class="badge bg-warning">{{ trans('labels.low_qty') }}</span>
+                                                @endif
                                             @else
                                                 @if ($product->stock_management == 1)
                                                     @if (helper::checklowqty($product->id, $product->vendor_id) == 1)
@@ -95,7 +93,7 @@
                                                         <span
                                                             class="badge bg-success">{{ trans('labels.in_stock') }}</span>
                                                     @endif
-                                                    @else
+                                                @else
                                                     -
                                                 @endif
                                             @endif

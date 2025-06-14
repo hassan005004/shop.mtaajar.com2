@@ -1,109 +1,108 @@
 @extends('admin.layout.default')
 
 @section('content')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.edit') }}</h5>
+
+        <nav aria-label="breadcrumb">
+
+            <ol class="breadcrumb">
+
+                <li class="breadcrumb-item"><a href="{{ URL::to('admin/features') }}">{{ trans('labels.features') }}</a></li>
+
+                <li class="breadcrumb-item active {{ session()->get('direction') == 2 ? 'breadcrumb-rtl' : '' }}"
+                    aria-current="page">{{ trans('labels.edit') }}</li>
+
+            </ol>
+
+        </nav>
+
+    </div>
 
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="row">
 
-            <h5 class="text-capitalize fw-600 text-dark fs-4">{{ trans('labels.edit') }}</h5>
+        <div class="col-12">
 
-            <nav aria-label="breadcrumb">
+            <div class="card border-0 box-shadow">
 
-                <ol class="breadcrumb">
+                <div class="card-body">
 
-                    <li class="breadcrumb-item"><a href="{{ URL::to('admin/features') }}">{{ trans('labels.features') }}</a></li>
+                    <form action="{{ URL::to('/admin/features/update-' . $editfeature->id) }}" method="POST"
+                        enctype="multipart/form-data">
 
-                    <li class="breadcrumb-item active {{session()->get('direction') == 2 ? 'breadcrumb-rtl' : ''}}" aria-current="page">{{ trans('labels.edit') }}</li>
+                        @csrf
 
-                </ol>
+                        <div class="row">
 
-            </nav>
+                            <div class="form-group">
 
-        </div>
+                                <label class="form-label">{{ trans('labels.title') }}<span class="text-danger"> *
 
+                                    </span></label>
 
-        <div class="row">
+                                <input type="text" class="form-control" name="title" value="{{ $editfeature->title }}"
+                                    placeholder="{{ trans('labels.title') }}" required>
 
-            <div class="col-12">
-
-                <div class="card border-0 box-shadow">
-
-                    <div class="card-body">
-
-                        <form action="{{ URL::to('/admin/features/update-' . $editfeature->id) }}" method="POST" enctype="multipart/form-data">
-
-                            @csrf
-
-                            <div class="row">
-
-                                <div class="form-group">
-
-                                    <label class="form-label">{{ trans('labels.title') }}<span class="text-danger"> *
-
-                                        </span></label>
-
-                                    <input type="text" class="form-control" name="title" value="{{ $editfeature->title }}" placeholder="{{ trans('labels.title') }}" required>
-
-                                    @error('title')
-
+                                @error('title')
                                     <span class="text-danger">{{ $message }}</span>
+                                @enderror
 
-                                    @enderror
+                            </div>
 
-                                </div>
+                            <div class="form-group">
 
-                                <div class="form-group">
+                                <label class="form-label">{{ trans('labels.description') }}<span class="text-danger"> *
 
-                                    <label class="form-label">{{ trans('labels.description') }}<span class="text-danger"> *
+                                    </span></label>
 
-                                        </span></label>
+                                <textarea class="form-control" name="description" placeholder="{{ trans('labels.description') }}" rows="5"
+                                    required>{{ $editfeature->description }}</textarea>
 
-                                    <textarea class="form-control" name="description" placeholder="{{ trans('labels.description') }}" rows="5" required>{{ $editfeature->description }}</textarea>
-
-                                    @error('description')
-
+                                @error('description')
                                     <span class="text-danger">{{ $message }}</span>
+                                @enderror
 
-                                    @enderror
+                            </div>
 
-                                </div>
+                            <div class="form-group">
 
-                                <div class="form-group">
+                                <label class="form-label">{{ trans('labels.image') }} <span class="text-danger"> *
 
-                                    <label class="form-label">{{ trans('labels.image') }} <span class="text-danger"> *
+                                    </span></label>
 
-                                        </span></label>
+                                <input type="file" class="form-control" name="image">
 
-                                    <input type="file" class="form-control" name="image">
-
-                                    @error('image')
-
+                                @error('image')
                                     <span class="text-danger">{{ $message }} <br></span>
+                                @enderror
 
-                                    @enderror
-
-                                    <img src="{{ helper::image_path($editfeature->image) }}" class="img-fluid rounded hw-50 mt-1" alt="">
-
-                                </div>
+                                <img src="{{ helper::image_path($editfeature->image) }}"
+                                    class="img-fluid rounded hw-50 mt-1" alt="">
 
                             </div>
 
-                            <div class="form-group {{session()->get('direction') == 2 ? 'text-start' : 'text-end'}}">
+                        </div>
 
-                                <a href="{{ URL::to('admin/features') }}" class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
+                        <div class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
 
-                                <button @if (env('Environment')=='sendbox' ) type="button" onclick="myFunction()" @else type="submit" @endif class="btn btn-primary px-sm-4">{{ trans('labels.save') }}</button>
+                            <a href="{{ URL::to('admin/features') }}"
+                                class="btn btn-danger px-sm-4">{{ trans('labels.cancel') }}</a>
 
-                            </div>
+                            <button
+                                @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
+                                class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_features', Auth::user()->role_id, Auth::user()->vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}</button>
 
-                        </form>
+                        </div>
 
-                    </div>
+                    </form>
 
                 </div>
 
             </div>
 
         </div>
-   
+
+    </div>
 @endsection

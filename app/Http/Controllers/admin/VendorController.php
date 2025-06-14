@@ -412,8 +412,6 @@ class VendorController extends Controller
             $settingsdata->date_format = $request->date_format;
             $settingsdata->order_prefix = $request->order_prefix;
             $settingsdata->min_order_amount = $request->min_order_amount;
-            $settingsdata->min_order_amount_for_free_shipping = $request->min_order_amount_for_free_shipping;
-            $settingsdata->shipping_charges = $request->shipping_charges;
             $order = Order::where('vendor_id', $vendor_id)->get();
             if ($order->count() == 0 && $request->order_number_start != null && $request->order_number_start != "") {
                 $settingsdata->order_number_start = $request->order_number_start;

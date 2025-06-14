@@ -16,39 +16,72 @@
                 <ul class="list-group list-options">
                     <a href="#themesettings" data-tab="themesettings"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center active"
-                        aria-current="true">{{ trans('labels.theme_settings') }} <i class="fa-regular fa-angle-right"></i></a>
+                        aria-current="true">{{ trans('labels.theme_settings') }}
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                    </a>
                     <a href="#contact_settings" data-tab="contact_settings"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                        aria-current="true">{{ trans('labels.contact_settings') }} <i
-                            class="fa-regular fa-angle-right"></i></a>
+                        aria-current="true">{{ trans('labels.contact_settings') }}
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                    </a>
                     <a href="#seo" data-tab="seo"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                         aria-current="true">{{ trans('labels.seo') }}
-                        <i class="fa-regular fa-angle-right"></i>
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                     </a>
-                    @if (Auth::user()->type == 1)
+                    @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                         @if (@helper::checkaddons('vendor_app'))
                             <a href="#app_section" data-tab="app_section"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                aria-current="true">{{ trans('labels.app_section') }} <i
-                                    class="fa-regular fa-angle-right"></i></a>
+                                aria-current="true">{{ trans('labels.app_section') }}
+                                <i
+                                    class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                            </a>
                         @endif
                         <a href="#fun_fact" data-tab="fun_fact"
                             class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                            aria-current="true">{{ trans('labels.fun_fact') }} <i class="fa-regular fa-angle-right"></i></a>
-                    @else
-                        @if (@helper::checkaddons('user_app'))
-                            <a href="#app_section" data-tab="app_section"
-                                class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                                aria-current="true">{{ trans('labels.app_section') }} <i
-                                    class="fa-regular fa-angle-right"></i></a>
-                        @endif
+                            aria-current="true">{{ trans('labels.fun_fact') }}
+                            <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                        </a>
                     @endif
-                    @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                    @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                        @if (@helper::checkaddons('subscription'))
+                            @if (@helper::checkaddons('user_app'))
+                                @php
+                                    $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
+                                        ->orderByDesc('id')
+                                        ->first();
+
+                                    if ($user->allow_without_subscription == 1) {
+                                        $user_app = 1;
+                                    } else {
+                                        $user_app = @$checkplan->customer_app;
+                                    }
+                                @endphp
+                                @if ($user_app == 1)
+                                    <a href="#app_section" data-tab="app_section"
+                                        class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                                        aria-current="true">{{ trans('labels.app_section') }}
+                                        <i
+                                            class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                                    </a>
+                                @endif
+                            @endif
+                        @else
+                            @if (@helper::checkaddons('user_app'))
+                                <a href="#app_section" data-tab="app_section"
+                                    class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                                    aria-current="true">{{ trans('labels.app_section') }}
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                                </a>
+                            @endif
+                        @endif
                         <a href="#footer_features" data-tab="footer_features"
                             class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                            aria-current="true">{{ trans('labels.footer_features') }} <i
-                                class="fa-regular fa-angle-right"></i></a>
+                            aria-current="true">{{ trans('labels.footer_features') }}
+                            <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                        </a>
                         @if (@helper::checkaddons('subscription'))
                             @if (@helper::checkaddons('pwa'))
                                 @php
@@ -70,7 +103,8 @@
                                             @if (env('Environment') == 'sendbox')
                                                 <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                             @endif
-                                            <i class="fa-regular fa-angle-right"></i>
+                                            <i
+                                                class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                         </div>
                                     </a>
                                 @endif
@@ -84,8 +118,8 @@
                                         @if (env('Environment') == 'sendbox')
                                             <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                         @endif
-                                        <i class="fa-regular fa-angle-right"></i>
-                                        <div class="d-flex gap-2 align-items-center">
+                                        <i
+                                            class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </a>
                             @endif
                         @endif
@@ -97,7 +131,21 @@
                                     @if (env('Environment') == 'sendbox')
                                         <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
                                     @endif
-                                    <i class="fa-regular fa-angle-right"></i>
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                                </div>
+                            </a>
+                        @endif
+                        @if (@helper::checkaddons('vendor_tip'))
+                            <a href="#tips_settings" data-tab="tips_settings"
+                                class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                                aria-current="true">{{ trans('labels.tips_settings') }}
+                                <div class="d-flex gap-2 align-items-center">
+                                    @if (env('Environment') == 'sendbox')
+                                        <span class="badge badge bg-danger">{{ trans('labels.addon') }}</span>
+                                    @endif
+                                    <i
+                                        class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                                 </div>
                             </a>
                         @endif
@@ -105,11 +153,13 @@
                     @endif
                     <a href="#social_links" data-tab="social_links"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
-                        aria-current="true">{{ trans('labels.social_link') }} <i class="fa-regular fa-angle-right"></i></a>
+                        aria-current="true">{{ trans('labels.social_link') }}
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                    </a>
                     <a href="#other" data-tab="other"
                         class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
                         aria-current="true">{{ trans('labels.other') }}
-                        <i class="fa-regular fa-angle-right"></i>
+                        <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                     </a>
                 </ul>
             </div>
@@ -132,12 +182,13 @@
                                         enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
-                                            @if (Auth::user()->type == 1)
+                                            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                 <div class="form-group col-sm-12">
                                                     <label class="form-label">{{ trans('labels.landing_page') }}
                                                         {{ trans('labels.title') }}<span class="text-danger"> *
                                                         </span></label>
-                                                    <input type="text" class="form-control" name="landing_website_title"
+                                                    <input type="text" class="form-control"
+                                                        name="landing_website_title"
                                                         value="{{ @$settingdata->landing_website_title }}"
                                                         placeholder="{{ trans('labels.landing_page') }} {{ trans('labels.title') }}">
                                                     @error('landing_website_title')
@@ -166,7 +217,7 @@
                                                     @enderror
                                                 </div>
                                             @endif
-                                            @if (Auth::user()->type == 1)
+                                            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                 <div class="form-group col-sm-6">
                                                     <label class="form-label">{{ trans('labels.primary_color') }}</label>
                                                     <input type="color"
@@ -219,7 +270,7 @@
                                                     src="{{ helper::image_path(@$settingdata->favicon) }}"
                                                     alt="">
                                             </div>
-                                            @if (Auth::user()->type == 1)
+                                            @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                 <div class="form-group col-sm-6">
                                                     <label class="form-label"
                                                         for="">{{ trans('labels.landing_page') }} </label>
@@ -237,7 +288,7 @@
                                                     </label>
                                                 </div>
                                             @endif
-                                            @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                                            @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
                                                 @php
                                                     $checktheme = @helper::checkthemeaddons('theme_');
                                                     $themes = [];
@@ -299,7 +350,8 @@
                                             @endif
                                         </div>
 
-                                        <div class="text-end">
+                                        <div
+                                            class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                                             <button
                                                 @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif
                                                 class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_basic_settings', Auth::user()->role_id, $vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}">{{ trans('labels.save') }}
@@ -351,68 +403,6 @@
                                                     <small class="text-danger">{{ $message }}</small>
                                                 @enderror
                                             </div>
-
-                                            @if (Auth::user()->type == 1)
-                                                @if (@helper::checkaddons('whatsapp_message'))
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label
-                                                                class="form-label">{{ trans('labels.contact') }}</label>
-                                                            <input type="text" class="form-control numbers_only"
-                                                                name="contact"
-                                                                value="{{ @$settingdata->whatsapp_number }}"
-                                                                placeholder="{{ trans('labels.contact') }}">
-                                                            @error('contact')
-                                                                <small class="text-danger">{{ $message }}</small>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-3 form-group">
-                                                        <label class="form-label"
-                                                            for="">{{ trans('labels.whatsapp_chat') }}
-                                                        </label>
-                                                        <div class="text-center">
-                                                            <input id="whatsapp_chat_on_off" type="checkbox"
-                                                                class="checkbox-switch" name="whatsapp_chat_on_off"
-                                                                value="1"
-                                                                {{ $settingdata->whatsapp_chat_on_off == 1 ? 'checked' : '' }}>
-                                                            <label for="whatsapp_chat_on_off" class="switch">
-                                                                <span
-                                                                    class="{{ session()->get('direction') == 2 ? 'switch__circle-rtl' : 'switch__circle' }}"><span
-                                                                        class="switch__circle-inner"></span></span>
-                                                                <span
-                                                                    class="switch__left {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">{{ trans('labels.off') }}</span>
-                                                                <span
-                                                                    class="switch__right {{ session()->get('direction') == 2 ? 'ps-2' : 'pe-2' }}">{{ trans('labels.on') }}</span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="col-md-3 form-group">
-                                                        <p class="form-label">
-                                                            {{ trans('labels.whatsapp_chat_position') }}
-                                                        </p>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input form-check-input-secondary"
-                                                                type="radio" name="whatsapp_chat_position"
-                                                                id="chatradio" value="1"
-                                                                {{ @$settingdata->whatsapp_chat_position == '1' ? 'checked' : '' }} />
-                                                            <label for="chatradio"
-                                                                class="form-check-label">{{ trans('labels.left') }}</label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input form-check-input-secondary"
-                                                                type="radio" name="whatsapp_chat_position"
-                                                                id="chatradio1" value="2"
-                                                                {{ @$settingdata->whatsapp_chat_position == '2' ? 'checked' : '' }} />
-                                                            <label for="chatradio1"
-                                                                class="form-check-label">{{ trans('labels.right') }}</label>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endif
-
                                         </div>
                                         <div
                                             class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
@@ -482,104 +472,10 @@
                     </div>
                 </div>
 
-                <div id="app_section">
-                    <div class="row mb-5">
-                        <div class="col-12">
-                            <div class="card rounded overflow-hidden border-0 box-shadow">
-
-                                <form action="{{ URL::to('admin/app_section/update') }}" method="POST"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="card-header p-3 bg-secondary">
-                                        <div class="d-flex align-items-center  justify-content-between">
-                                            <h5 class="text-capitalize fw-600">
-                                                {{ trans('labels.app_section') }}</h5>
-                                            <div>
-                                                <input id="mobile_app-switch" type="checkbox" class="checkbox-switch"
-                                                    name="mobile_app_on_off" value="1"
-                                                    {{ @$app->mobile_app_on_off == 1 ? 'checked' : '' }}>
-                                                <label for="mobile_app-switch" class="switch">
-                                                    <span
-                                                        class="{{ session()->get('direction') == 2 ? 'switch__circle-rtl' : 'switch__circle' }}"><span
-                                                            class="switch__circle-inner"></span></span>
-                                                    <span
-                                                        class="switch__left {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">{{ trans('labels.off') }}</span>
-                                                    <span
-                                                        class="switch__right {{ session()->get('direction') == 2 ? 'ps-2' : 'pe-2' }}">{{ trans('labels.on') }}</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body pb-0">
-
-                                        <div class="row">
-
-                                            @if (Auth::user()->type == 2 || Auth::user()->type == 4)
-                                                <div class="form-group col-md-6">
-                                                    <label class="form-label">{{ trans('labels.title') }} <span
-                                                            class="text-danger"> * </span></label>
-                                                    <input type="text" class="form-control" name="title"
-                                                        value="{{ @$app->title }}"
-                                                        placeholder="{{ trans('labels.title') }}" required>
-                                                    @error('title')
-                                                        <span class="text-danger">{{ $message }}</span> <br>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label class="form-label">{{ trans('labels.sub_title') }} <span
-                                                            class="text-danger"> * </span></label>
-                                                    <input type="text" class="form-control" name="sub_title"
-                                                        value="{{ @$app->subtitle }}"
-                                                        placeholder="{{ trans('labels.sub_title') }}" required>
-                                                    @error('sub_title')
-                                                        <span class="text-danger">{{ $message }}</span> <br>
-                                                    @enderror
-                                                </div>
-                                            @endif
-                                            <div class="form-group col-md-6">
-                                                <label class="form-label">{{ trans('labels.android_link') }} <span
-                                                        class="text-danger"> * </span></label>
-                                                <input type="text" class="form-control" name="android_link"
-                                                    value="{{ @$app->android_link }}"
-                                                    placeholder="{{ trans('labels.android_link') }}" required>
-                                                @error('android_link')
-                                                    <span class="text-danger">{{ $message }}</span> <br>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="form-label">{{ trans('labels.ios_link') }} <span
-                                                        class="text-danger"> * </span></label>
-                                                <input type="text" class="form-control" name="ios_link"
-                                                    value="{{ @$app->ios_link }}"
-                                                    placeholder="{{ trans('labels.ios_link') }}" required>
-                                                @error('ios_link')
-                                                    <span class="text-danger">{{ $message }}</span> <br>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="form-label">{{ trans('labels.image') }} <span
-                                                        class="text-danger"> * </span></label>
-                                                <input type="file" class="form-control" name="image">
-                                                @error('image')
-                                                    <span class="text-danger">{{ $message }}</span> <br>
-                                                @enderror
-                                                <img class="img-fluid rounded img-height mt-1 object-fit-cover"
-                                                    src="{{ helper::image_Path(@$app->image) }}" alt="">
-                                            </div>
-                                            <div
-                                                class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                                <button
-                                                    class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_basic_settings', Auth::user()->role_id, $vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
-                                                    @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif>{{ trans('labels.save') }}</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @if (Auth::user()->type == 1)
+                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
+                    @if (@helper::checkaddons('vendor_app'))
+                        @include('admin.mobile_app.app_section')
+                    @endif
                     <div id="fun_fact">
                         <div class="row mb-5">
                             <div class="col-12">
@@ -694,7 +590,8 @@
                                                     <span class="extra_footer_features"></span>
                                                     <div
                                                         class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
-                                                        <button class="btn btn-primary px-sm-4"
+                                                        <button
+                                                            class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_basic_settings', Auth::user()->role_id, $vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
                                                             @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif>{{ trans('labels.save') }}</button>
                                                     </div>
                                                 </div>
@@ -706,9 +603,29 @@
                         </div>
                     </div>
                 @endif
+                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                    @if (@helper::checkaddons('subscription'))
+                        @if (@helper::checkaddons('user_app'))
+                            @php
+                                $checkplan = App\Models\Transaction::where('vendor_id', $vendor_id)
+                                    ->orderByDesc('id')
+                                    ->first();
 
-
-                @if (Auth::user()->type == 2 || Auth::user()->type == 4)
+                                if (@$user->allow_without_subscription == 1) {
+                                    $user_app = 1;
+                                } else {
+                                    $user_app = @$checkplan->customer_app;
+                                }
+                            @endphp
+                            @if ($user_app == 1)
+                                @include('admin.mobile_app.app_section')
+                            @endif
+                        @endif
+                    @else
+                        @if (@helper::checkaddons('user_app'))
+                            @include('admin.mobile_app.app_section')
+                        @endif
+                    @endif
                     <div id="footer_features">
                         <div class="row mb-5">
                             <div class="col-12">
@@ -780,7 +697,8 @@
                                                         </div>
                                                     @endforeach
                                                     <span class="extra_footer_features"></span>
-                                                    <div class="form-group text-end">
+                                                    <div
+                                                        class="form-group {{ session()->get('direction') == 2 ? 'text-start' : 'text-end' }}">
                                                         <button
                                                             class="btn btn-primary px-sm-4 {{ Auth::user()->type == 4 ? (helper::check_access('role_basic_settings', Auth::user()->role_id, $vendor_id, 'edit') == 1 ? '' : 'd-none') : '' }}"
                                                             @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" @endif>{{ trans('labels.save') }}</button>
@@ -818,6 +736,9 @@
 
                     @if (@helper::checkaddons('age_verification'))
                         @include('admin.age_verification.index')
+                    @endif
+                    @if (@helper::checkaddons('vendor_tip'))
+                        @include('admin.tips_settings.tips_settings')
                     @endif
                 @endif
                 <div id="social_links">
@@ -903,8 +824,8 @@
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="row">
-                                                @if (Auth::user()->type == 2 || Auth::user()->type == 4)
-                                                    <div class="form-group col-sm-3">
+                                                @if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1))
+                                                    <div class="form-group col-sm-6">
                                                         <label
                                                             class="form-label">{{ trans('labels.google_review_url') }}</label>
                                                         <input type="text" class="form-control"
@@ -916,26 +837,6 @@
                                                         @enderror
                                                     </div>
 
-                                                    <div class="col-md-3 form-group">
-                                                        <label class="form-label"
-                                                            for="">{{ trans('labels.subscribe_newsletter') }}
-                                                        </label>
-                                                        <div class="text-center">
-                                                            <input id="subscribe_newsletter" type="checkbox"
-                                                                class="checkbox-switch" name="subscribe_newsletter"
-                                                                value="1"
-                                                                {{ $settingdata->subscribe_newsletter == 1 ? 'checked' : '' }}>
-                                                            <label for="subscribe_newsletter" class="switch">
-                                                                <span
-                                                                    class="{{ session()->get('direction') == 2 ? 'switch__circle-rtl' : 'switch__circle' }}"><span
-                                                                        class="switch__circle-inner"></span></span>
-                                                                <span
-                                                                    class="switch__left {{ session()->get('direction') == 2 ? 'pe-2' : 'ps-2' }}">{{ trans('labels.off') }}</span>
-                                                                <span
-                                                                    class="switch__right {{ session()->get('direction') == 2 ? 'ps-2' : 'pe-2' }}">{{ trans('labels.on') }}</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
                                                     @if (@helper::checkaddons('product_reviews'))
                                                         <div class="col-md-3 form-group">
                                                             <label class="form-label"
@@ -1093,7 +994,7 @@
                                                             alt="">
                                                     </div>
                                                 @endif
-                                                @if (Auth::user()->type == 1)
+                                                @if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))
                                                     <div class="form-group col-sm-6">
                                                         <label
                                                             class="form-label">{{ trans('labels.landing_home_banner') }}</label>
@@ -1101,15 +1002,6 @@
                                                             name="landing_home_banner">
                                                         <img class="img-fluid rounded hw-70 mt-1 object-fit-cover"
                                                             src="{{ helper::image_path(@$landingdata->landing_home_banner) }}"
-                                                            alt="">
-                                                    </div>
-                                                    <div class="form-group col-sm-6">
-                                                        <label
-                                                            class="form-label">{{ trans('labels.testimonial_image') }}</label>
-                                                        <input type="file" class="form-control"
-                                                            name="testimonial_image">
-                                                        <img class="img-fluid rounded hw-70 mt-1 object-fit-cover"
-                                                            src="{{ helper::image_path(@$landingdata->testimonial_image) }}"
                                                             alt="">
                                                     </div>
                                                     <div class="form-group col-sm-6">

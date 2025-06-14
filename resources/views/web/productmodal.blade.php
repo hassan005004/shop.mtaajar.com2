@@ -243,8 +243,9 @@
                                                             <div
                                                                 class="form-check m-0 p-0 d-flex gap-2 align-items-center">
                                                                 <input type="checkbox"
-                                                                    class="form-check-input p-0 m-0 Checkbox" name="addons[]"
-                                                                    extras_name="{{ $extras->name }}" value="{{ $extras->id }}"
+                                                                    class="form-check-input p-0 m-0 Checkbox"
+                                                                    name="addons[]" extras_name="{{ $extras->name }}"
+                                                                    value="{{ $extras->id }}"
                                                                     price="{{ $extras->price }}"
                                                                     id="extracheck_{{ $key }}_{{ $getitem->id }}">
                                                                 <label class="form-check-label w-100 m-0 p-0"
@@ -328,7 +329,7 @@
                                                             @if (Auth::user() && Auth::user()->type == 3)
                                                                 @php
 
-                                                                    $favorite = helper::ceckfavorite(
+                                                                    $favorite = helper::checkfavorite(
                                                                         $getitem->id,
                                                                         $vendordata->id,
                                                                         Auth::user()->id,
@@ -420,9 +421,9 @@
                 value="{{ @$getitem['product_image']->image }}">
             <input type="hidden" name="item_min_order" id="item_min_order" value="{{ $getitem->min_order }}">
             <input type="hidden" name="item_max_order" id="item_max_order" value="{{ $getitem->max_order }}">
-            <input type="hidden" name="item_price" id="overview_item_price" value="{{ $getitem->price }}">
+            <input type="hidden" name="item_price" id="overview_item_price" value="{{ $price }}">
             <input type="hidden" name="item_original_price" id="overview_item_original_price"
-                value ="{{ $getitem->original_price }}">
+                value ="{{ $getitem->item_original_price }}">
             <input type="hidden" name="tax" id="tax_val" value="{{ $getitem->tax }}">
             <input type="hidden" name="variants_name" id="variants_name">
             <input type="hidden" name="stock_management" id="stock_management"
@@ -555,6 +556,5 @@
     }
 
     var formate = "{{ helper::appdata($vendordata->id)->currency_formate }}";
-    // var poscondition = "{{ request()->is('admin/pos/item-details') }}";
 </script>
 <script src="{{ url(env('ASSETPATHURL') . 'web-assets/js/products.js') }}"></script>
