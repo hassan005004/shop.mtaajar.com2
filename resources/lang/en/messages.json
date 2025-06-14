@@ -141,5 +141,6 @@
     "payment_selection_required":"Please select a payment method",
     "enter_amount":"Please enter the amount",
     "enter_transaction_id":"Please enter the transaction ID.",
-    "enter_promocode":"Please select promocode to apply discount"
+    "enter_promocode":"Please select promocode to apply discount",
+    "product_inquiry_note":"Please let us know whats on your mind. Have a question for us? Ask away"
 }

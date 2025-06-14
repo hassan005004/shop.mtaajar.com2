@@ -11,9 +11,11 @@ use App\Models\Contact;
 use App\Models\Country;
 use App\Models\City;
 use App\Models\Faq;
+use App\Models\Shipping;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use URL;
+use Illuminate\Support\Facades\URL;
+use Jorenvh\Share\ShareFacade;
 
 class OtherPagesController extends Controller
 {
@@ -43,7 +45,7 @@ class OtherPagesController extends Controller
         } else {
             $vendor_id = Auth::user()->id;
         }
-        $getinquiries = Contact::where('vendor_id', $vendor_id)->orderByDesc('id')->get();
+        $getinquiries = Contact::where('vendor_id', $vendor_id)->where('product_id', null)->orderByDesc('id')->get();
         return view('admin.inquiries.index', compact('getinquiries'));
     }
     public function inquiries_delete(Request $request)
@@ -365,7 +367,7 @@ class OtherPagesController extends Controller
         $user = User::where('id', $vendor_id)->first();
 
         $url = URL::to('/' . $user->slug);
-        $shareComponent = \Share::page(
+        $shareComponent = ShareFacade::page(
             $url
         )
             ->facebook()
@@ -414,5 +416,32 @@ class OtherPagesController extends Controller
             }
         }
         return response()->json(['status' => 1, 'msg' => trans('messages.success')], 200);
+    }
+
+    /*===================================== Shipping ==================================*/
+    public function shippingindex(Request $request)
+    {
+        if (Auth::user()->type == 4) {
+            $vendor_id = Auth::user()->vendor_id;
+        } else {
+            $vendor_id = Auth::user()->id;
+        }
+        $content = Settings::where('vendor_id', $vendor_id)->first();
+        $allshippingcontent = Shipping::where('vendor_id', $vendor_id)->orderBy('reorder_id')->get();
+        return view('admin.shipping.index', compact('content', 'allshippingcontent'));
+    }
+    public function savecontent(Request $request)
+    {
+        if (Auth::user()->type == 4) {
+            $vendor_id = Auth::user()->vendor_id;
+        } else {
+            $vendor_id = Auth::user()->id;
+        }
+        $newcontent = Settings::where('vendor_id', $vendor_id)->first();
+        $newcontent->min_order_amount_for_free_shipping = $request->min_order_amount_for_free_shipping;
+        $newcontent->shipping_charges = $request->shipping_charges;
+        $newcontent->shipping_area = isset($request->shipping_area) ? 1 : 2;
+        $newcontent->save();
+        return redirect('admin/shipping')->with('success', trans('messages.success'));
     }
 }

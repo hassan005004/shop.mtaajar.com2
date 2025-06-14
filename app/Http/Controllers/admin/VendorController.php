@@ -203,7 +203,7 @@ class VendorController extends Controller
     public function vendor_login(Request $request)
     {
         $user = User::where('slug', $request->slug)->first();
-        session()->put('vendor_login', 1);
+        session()->put('vendor_login', Auth::user()->id);
         Auth::login($user);
         return redirect('admin/dashboard');
     }
@@ -219,7 +219,7 @@ class VendorController extends Controller
     }
     public function admin_back()
     {
-        $getuser = User::where('type', '1')->first();
+        $getuser = User::where('id', session()->get('vendor_login'))->first();
         Auth::login($getuser);
         session()->forget('vendor_login');
         return redirect('admin/users');
@@ -295,7 +295,7 @@ class VendorController extends Controller
             return redirect()->back()->with('error', trans('messages.unique_slug'));
         }
         $data = helper::vendor_register($request->name, $request->email, $request->mobile, hash::make($request->password), '', $request->slug, '', '', $request->country, $request->city, $request->store, $request->product_type);
-        if (Auth::user() && Auth::user()->type == 1) {
+        if (Auth::user() && (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1))) {
             return redirect('admin/users')->with('success', trans('messages.success'));
         } else {
             $newuser = User::select('id', 'name', 'email', 'mobile', 'image')->where('id', $data)->first();
@@ -355,7 +355,7 @@ class VendorController extends Controller
         $pixelsettings = Pixcel::where('vendor_id', Auth::user()->id)->first();
         $order = Order::where('vendor_id', $vendor_id)->get();
         $getpayment = Payment::where('is_available', '1')->where('vendor_id', $vendor_id)->where('is_activate', '1')->orderBy('reorder_id')->get();
-        return view('admin.settings.index', compact('settingdata', 'othersettingdata', 'getfooterfeatures', 'theme', 'countries', 'pixelsettings', 'order', 'getpayment'));
+        return view('admin.settings.index', compact('settingdata', 'othersettingdata', 'getfooterfeatures', 'theme', 'countries', 'pixelsettings', 'order', 'getpayment', 'vendor_id'));
     }
     public function delete_feature(Request $request)
     {
@@ -568,7 +568,7 @@ class VendorController extends Controller
         $slug = $request->vendor_slug;
         return view('admin.auth.userforgotpassword', compact('slug'));
     }
-    
+
     public function check_login(Request $request)
     {
 

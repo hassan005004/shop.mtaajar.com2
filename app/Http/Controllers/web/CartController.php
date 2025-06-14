@@ -217,7 +217,7 @@ class CartController extends Controller
             $extra_price = explode('|', $request->extras_price);
             if ($request->extras_price != null || $request->extras_price != "") {
                 foreach ($extra_price as $price) {
-                    $cartprice  = $cartprice +  $price;
+                    $cartprice  = $cartprice + $price;
                 }
             }
             $cart->attribute = $request->attribute == "" ? "" : $request->attribute;

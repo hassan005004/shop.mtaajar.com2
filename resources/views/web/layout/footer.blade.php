@@ -163,25 +163,23 @@
 
                                     </ul>
                                 </div>
-                                @if (helper::appdata($vendordata->id)->subscribe_newsletter == 1)
-                                    <div class="subscribe-box">
-                                        <p class="text-dark fw-600 mb-3 text-capitalize fs-5">
-                                            {{ trans('labels.subscribe') }}</p>
-                                        <span
-                                            class="text-dark fs-7">{{ trans('labels.footer_subscribe_subtitle') }}</span>
+                                <div class="subscribe-box">
+                                    <p class="text-dark fw-600 mb-3 text-capitalize fs-5">
+                                        {{ trans('labels.subscribe') }}</p>
+                                    <span
+                                        class="text-dark fs-7">{{ trans('labels.footer_subscribe_subtitle') }}</span>
+                                </div>
+                                <form action="{{ URL::to($vendordata->slug . '/subscribe') }}" method="POST"
+                                    class="mt-3">
+                                    @csrf
+                                    <div class="input-group">
+                                        <input type="text"
+                                            class="form-control fs-7 border text-dark fw-500 rounded-0 bg-white {{ session()->get('direction') == 2 ? 'ms-2' : 'me-2' }}"
+                                            name="subscribe_email" placeholder="example@yormailer.com" required>
+                                        <button class="btn btn-primary fs-7 fw-600 rounded-0 mb-0"
+                                            type="submit">{{ trans('labels.subscribe') }} </button>
                                     </div>
-                                    <form action="{{ URL::to($vendordata->slug . '/subscribe') }}" method="POST"
-                                        class="mt-3">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="text"
-                                                class="form-control fs-7 border text-dark fw-500 rounded-0 bg-white {{ session()->get('direction') == 2 ? 'ms-2' : 'me-2' }}"
-                                                name="subscribe_email" placeholder="example@yormailer.com" required>
-                                            <button class="btn btn-primary fs-7 fw-600 rounded-0 mb-0"
-                                                type="submit">{{ trans('labels.subscribe') }} </button>
-                                        </div>
-                                    </form>
-                                @endif
+                                </form>
                             </div>
                         </div>
                     </div>

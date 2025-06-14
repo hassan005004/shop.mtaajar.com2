@@ -4,7 +4,7 @@
 
 createdoughnut(doughnutlabels, doughnutdata);
 
-$("#doughnutyear").on("change", function() {
+$("#doughnutyear").on("change", function () {
   "use strict";
 
   $.ajax({
@@ -22,11 +22,11 @@ $("#doughnutyear").on("change", function() {
 
     dataType: "JSON",
 
-    success: function(data) {
+    success: function (data) {
       createdoughnut(data.doughnutlabels, data.doughnutdata);
     },
 
-    error: function(data) {
+    error: function (data) {
       return false;
     }
   });
@@ -42,7 +42,7 @@ function createdoughnut(doughnutlabels, doughnutdata) {
       {
         label: "Total : ",
         backgroundColor: [
-          "rgba(54, 162, 235, 0.4)",
+          "rgba(235, 54, 69, 0.4)",
           "rgba(255, 150, 86, 0.4)",
           "rgba(140, 162, 198, 0.4)",
           "rgba(255, 206, 86, 0.4)",
@@ -56,7 +56,7 @@ function createdoughnut(doughnutlabels, doughnutdata) {
           "rgba(255, 159, 64, 0.4)"
         ],
         borderColor: [
-          "rgba(54, 162, 235, 1)",
+          "#d80131",
           "rgba(255, 150, 86, 1)",
           "rgba(140, 162, 198, 1)",
           "rgba(255, 206, 86, 1)",
@@ -105,7 +105,7 @@ function createdoughnut(doughnutlabels, doughnutdata) {
 
 createrevenueChart(labels, revenuedata);
 
-$("#revenueyear").on("change", function() {
+$("#revenueyear").on("change", function () {
   "use strict";
 
   $.ajax({
@@ -123,11 +123,11 @@ $("#revenueyear").on("change", function() {
 
     dataType: "JSON",
 
-    success: function(data) {
+    success: function (data) {
       createrevenueChart(data.revenuelabels, data.revenuedata);
     },
 
-    error: function(data) {
+    error: function (data) {
       return false;
     }
   });
@@ -144,12 +144,12 @@ function createrevenueChart(labels, revenuedata, year) {
         label: "Revenue ",
         fill: {
           target: "origin",
-          above: "#fbd6bd"
+          above: secondary_color_light
         },
-        borderColor: "#fbd6bd",
+        borderColor: secondary_color,
         tension: 0.1,
-        pointBackgroundColor: "#F15A24",
-        pointBorderColor: "#F15A24",
+        pointBackgroundColor: secondary_color,
+        pointBorderColor: secondary_color,
         data: revenuedata
       }
     ]

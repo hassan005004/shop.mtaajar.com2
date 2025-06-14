@@ -24,7 +24,7 @@ class TransactionController extends Controller
         $vendor_id = Auth::user()->id;
       }
       $vendors = User::whereNotIn('id', [1])->get();
-      if (Auth::user()->type == "1") {
+      if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1)) {
         $transaction = Transaction::with('vendor_info')->where('transaction_type', null)->orderByDesc('id');
         if (!empty($request->vendor)) {
           $transaction = $transaction->where('vendor_id', $request->vendor);
@@ -34,7 +34,7 @@ class TransactionController extends Controller
         }
         $transaction = $transaction->get();
       }
-      if (Auth::user()->type == "2" || Auth::user()->type == "4") {
+      if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1)) {
         $transaction = Transaction::with("plan_info")->where('transaction_type', null)->where('vendor_id', $vendor_id)->orderByDesc('id');
         if (!empty($request->startdate) && !empty($request->enddate)) {
           $transaction =  $transaction->whereBetween('purchase_date', [$request->startdate, $request->enddate]);

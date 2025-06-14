@@ -28,7 +28,7 @@ class PlanPricingController extends Controller
             return redirect()->back()->with(['error' => 'You can not charge your end customers in regular license. Please purchase extended license to charge your end customers']);
         } else {
             $allplan = PricingPlan::orderBy('reorder_id');
-            if (Auth::user()->type == 2 || Auth::user()->type == 4) {
+            if (Auth::user()->type == 2 || (Auth::user()->type == 4 && Auth::user()->vendor_id != 1)) {
                 $allplan = $allplan->where('is_available', '1');
             }
             $allplan = $allplan->get();
@@ -546,39 +546,9 @@ class PlanPricingController extends Controller
             $transaction->features = $plan->features;
             $transaction->transaction_number = Str::upper(Str::random(8));
             $transaction->save();
-            if (session()->get('payment_type') == "1") {
-                $payment_type = "cod";
-            }
-            if (session()->get('payment_type') == 2) {
-                $payment_type = "razorpay";
-            }
-            if (session()->get('payment_type') == 3) {
-                $payment_type = "stripe";
-            }
-            if (session()->get('payment_type') == 5) {
-                $payment_type = "paystack";
-            }
-            if (session()->get('payment_type') == 6) {
-                $payment_type = 'banktransfer';
-            }
-            if (session()->get('payment_type') == 7) {
-                $payment_type = "mercadopago";
-            }
-            if (session()->get('payment_type') == 8) {
-                $payment_type = "paypal";
-            }
-            if (session()->get('payment_type') == 9) {
-                $payment_type = "myfatoorah";
-            }
-            if (session()->get('payment_type') == 10) {
-                $payment_type = "toyyibpay";
-            }
-            if (session()->get('payment_type') == 11) {
-                $payment_type = "phonepe";
-            }
             $emaildata = helper::emailconfigration(helper::appdata('')->id);
             Config::set('mail', $emaildata);
-            helper::send_subscription_email(Auth::user()->email, Auth::user()->name, $plan->name, helper::get_plan_exp_date($plan->duration, $plan->days), helper::currency_formate($plan->price, ""), $payment_type, @$paymentid);
+            helper::send_subscription_email(Auth::user()->email, Auth::user()->name, $plan->name, helper::get_plan_exp_date($plan->duration, $plan->days), helper::currency_formate($plan->price, ""), helper::getpayment(session()->get('payment_type'), 1)->payment_name, @$paymentid);
 
             session()->forget(['amount', 'plan_id', 'payment_type', 'currency', 'returnUrl', 'successurl', 'failureurl', 'discount_data']);
 

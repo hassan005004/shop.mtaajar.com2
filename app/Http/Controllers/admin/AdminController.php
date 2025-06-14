@@ -36,7 +36,7 @@ class AdminController extends Controller
         $revenueyear = $request->revenueyear != "" ? $request->revenueyear : date('Y');
 
 
-        if (Auth::user()->type == 1) {
+        if (Auth::user()->type == 1 || (Auth::user()->type == 4 && Auth::user()->vendor_id == 1)) {
             $totalrevenue = Transaction::where('status', 2)->sum('amount');
             $totalvendors = User::where('id', '!=', 1)->where('is_available', 1)->where('type', 2)->where('is_deleted', 2)->count();
             $totalorders = Transaction::count('id');
@@ -54,21 +54,21 @@ class AdminController extends Controller
             $transaction = Transaction::with('vendor_info')->where('transaction_type', null)->whereDate('created_at', Carbon::today())->get();
             // revenue-CHART-END
             $getorders = array();
-            $topitems = Products::with('category_info', 'product_image')->join('order_details','order_details.product_id','products.id')
-            ->select('products.id','products.category_id','products.name','products.slug',DB::raw('count(order_details.product_id) as item_order_counter'))
-            ->groupBy('order_details.product_id')->having('item_order_counter','>',0)
-            ->where('products.vendor_id', $vendor_id)->where('products.is_deleted',2)->orderByDesc('item_order_counter')
-            ->get()->take(5);
+            $topitems = Products::with('category_info', 'product_image')->join('order_details', 'order_details.product_id', 'products.id')
+                ->select('products.id', 'products.category_id', 'products.name', 'products.slug', DB::raw('count(order_details.product_id) as item_order_counter'))
+                ->groupBy('order_details.product_id')->having('item_order_counter', '>', 0)
+                ->where('products.vendor_id', $vendor_id)->where('products.is_deleted', 2)->orderByDesc('item_order_counter')
+                ->get()->take(5);
             $orders = Order::where('vendor_id', $vendor_id)->get();
             $orderIds = $orders->pluck('id');
             $getorderdetailscount = OrderDetails::whereIn('order_id', $orderIds)->count();
-            
-            $topusers = User::join('orders','orders.user_id','users.id')
-             ->select('users.id','users.name','users.email','users.image','users.mobile',DB::raw('count(orders.user_id) as user_order_counter'))
-             ->having('user_order_counter','>',0)->where('orders.vendor_id',$vendor_id)->where('users.type',2)
-             ->where('users.is_available',1)->orderByDesc('user_order_counter')->get()->take(7);
+
+            $topusers = User::join('orders', 'orders.user_id', 'users.id')
+                ->select('users.id', 'users.name', 'users.email', 'users.image', 'users.mobile', DB::raw('count(orders.user_id) as user_order_counter'))
+                ->having('user_order_counter', '>', 0)->where('orders.vendor_id', $vendor_id)->where('users.type', 2)
+                ->where('users.is_available', 1)->orderByDesc('user_order_counter')->get()->take(7);
         } else {
-            $totalrevenue = Order::where('vendor_id', $vendor_id)->where('status_type', 3)->where('payment_status',2)->sum('grand_total');
+            $totalrevenue = Order::where('vendor_id', $vendor_id)->where('status_type', 3)->where('payment_status', 2)->sum('grand_total');
             $totalvendors = Products::where('vendor_id', $vendor_id)->count();
             $totalorders = Order::where('vendor_id', $vendor_id)->count();
             // DOUGHNUT-CHART-START
@@ -84,19 +84,19 @@ class AdminController extends Controller
             // revenue-CHART-END
             $getorders = order::where('vendor_id', $vendor_id)->whereIn('status_type', ['1', '2'])->orderByDesc('id')->get();
             $transaction = array();
-            $topitems = Products::with('category_info', 'product_image')->join('order_details','order_details.product_id','products.id')
-            ->select('products.id','products.category_id','products.name','products.slug',DB::raw('count(order_details.product_id) as item_order_counter'))
-            ->groupBy('order_details.product_id')->having('item_order_counter','>',0)
-            ->where('products.vendor_id', $vendor_id)->where('products.is_deleted',2)->orderByDesc('item_order_counter')
-            ->get()->take(5);
+            $topitems = Products::with('category_info', 'product_image')->join('order_details', 'order_details.product_id', 'products.id')
+                ->select('products.id', 'products.category_id', 'products.name', 'products.slug', DB::raw('count(order_details.product_id) as item_order_counter'))
+                ->groupBy('order_details.product_id')->having('item_order_counter', '>', 0)
+                ->where('products.vendor_id', $vendor_id)->where('products.is_deleted', 2)->orderByDesc('item_order_counter')
+                ->get()->take(5);
             $orders = Order::where('vendor_id', $vendor_id)->get();
             $orderIds = $orders->pluck('id');
             $getorderdetailscount = OrderDetails::whereIn('order_id', $orderIds)->count();
 
-            $topusers = User::join('orders','orders.user_id','users.id')
-            ->select('users.id','users.name','users.email','users.image','users.mobile',DB::raw('count(orders.user_id) as user_order_counter'))
-            ->having('user_order_counter','>',0)->where('orders.vendor_id',$vendor_id)->where('users.type',3)
-            ->where('users.is_available',1)->orderByDesc('user_order_counter')->get()->take(7);
+            $topusers = User::join('orders', 'orders.user_id', 'users.id')
+                ->select('users.id', 'users.name', 'users.email', 'users.image', 'users.mobile', DB::raw('count(orders.user_id) as user_order_counter'))
+                ->having('user_order_counter', '>', 0)->where('orders.vendor_id', $vendor_id)->where('users.type', 3)
+                ->where('users.is_available', 1)->orderByDesc('user_order_counter')->get()->take(7);
         }
 
         if (env('Environment') == 'sendbox') {
@@ -168,7 +168,7 @@ class AdminController extends Controller
     }
     public function login()
     {
-        if(!file_exists(storage_path() . "/installed")) {
+        if (!file_exists(storage_path() . "/installed")) {
             return redirect('install');
             exit;
         }
@@ -187,7 +187,7 @@ class AdminController extends Controller
             'password.required' => trans('messages.password_required'),
         ]);
         session()->put('admin_login', 1);
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'type' => [1,2,4], 'is_deleted' => 2])) {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'type' => [1, 2, 4], 'is_deleted' => 2])) {
             if (!Auth::user()) {
                 return Redirect::to('/admin/verify')->with('error', Session::get('from_message'));
             }
@@ -254,6 +254,6 @@ class AdminController extends Controller
     {
         session()->put('demo', $request->demo_type);
 
-        return response()->json(['status' => 1,'msg' => trans('messages.success')], 200);
+        return response()->json(['status' => 1, 'msg' => trans('messages.success')], 200);
     }
 }

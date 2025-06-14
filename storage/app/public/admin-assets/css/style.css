@@ -2,7 +2,7 @@
 Script: FashionHub SaaS
 Author: Papon IT Solution
 Support: paponapp2244@gmail.com
-Version: 3.9
+Version: 4.0
 */
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
@@ -505,7 +505,7 @@ input::-webkit-inner-spin-button {
   top: 80px;
   z-index: 1020;
   background-color: transparent;
-  height: 685px;
+  height: 78vh;
   overflow-y: auto;
 }
 
@@ -2127,7 +2127,7 @@ div#social-links ul li a {
   --bs-gradient: none
 }
 
-.dropdown-menu {
+/* .dropdown-menu {
   --bs-dropdown-min-width: 10rem;
   --bs-dropdown-padding-x: 0;
   --bs-dropdown-padding-y: 0.5rem;
@@ -2167,7 +2167,7 @@ div#social-links ul li a {
   background-clip: padding-box;
   border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
   border-radius: var(--bs-dropdown-border-radius)
-}
+} */
 
 .btn-info {
   --bs-btn-color: #fff;
@@ -2583,6 +2583,12 @@ a {
   color: var(--bs-dropdown-link-active-color) !important;
   text-decoration: none;
   background-color: #000000;
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+  color: var(--bs-dropdown-link-hover-color);
+  background-color: #ffffff;
 }
 
 .sub-plan {
@@ -3159,6 +3165,13 @@ a {
   justify-content: center;
 }
 
-.w-5{
+.lag-btn .dropdown-menu {
+  --bs-dropdown-min-width: 8rem !important;
+  padding: 0px 0px !important;
+  overflow: hidden !important;
+  font-size: 12px !important;
+}
+
+.w-5 {
   width: 5rem !important;
 }

@@ -155,6 +155,58 @@ $(".hotels-slaider").owlCarousel({
     }
   }
 });
+
+$(".funface-icon").owlCarousel({
+  rtl: layout == 2 ? true : false,
+  loop: true,
+  margin: 15,
+  autoplay: true,
+  slideTransition: 'linear',
+  autoplayTimeout: 3000,
+  autoplaySpeed: 3000,
+  nav: false,
+  dots: false,
+  responsive: {
+    0: {
+      items: 1
+    },
+    600: {
+      items: 2
+    },
+    991: {
+      items: 2
+    }
+  }
+});
+
+$('#testimonial-12').owlCarousel({
+  rtl: layout == 2 ? true : false,
+  loop: true,
+  margin: 10,
+  nav: false,
+  dots: false,
+  autoplay: true,
+  autoHeight: true,
+  navText: ["<i class='fa-solid fa-arrow-left-long'></i>", "<i class='fa-solid fa-arrow-right-long'></i>"],
+  slideTransition: 'linear',
+  autoplayTimeout: 4000,
+  autoplaySpeed: 4000,
+  responsive: {
+    0: {
+      items: 1
+    },
+    600: {
+      items: 2
+    },
+    1000: {
+      items: 3
+    },
+    2000: {
+      items: 4
+    }
+  }
+});
+
 $(".card-section").owlCarousel({
   rtl: layout == 2 ? true : false,
   loop: true,
@@ -197,7 +249,7 @@ AOS.init({
   delay: 0, // values from 0 to 3000, with step 50ms
   duration: 400, // values from 0 to 3000, with step 50ms
   easing: "ease", // default easing for AOS animations
-  once: false, // whether animation should happen only once - while scrolling down
+  once: true, // whether animation should happen only once - while scrolling down
   mirror: false, // whether elements should animate out while scrolling past them
   anchorPlacement: "top-bottom" // defines which position of the element regarding to window should trigger the animation
 });

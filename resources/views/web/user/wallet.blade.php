@@ -60,7 +60,14 @@
                                                         <td>{{ helper::date_formate($row->created_at, $vendordata->id) }}<br>
                                                             {{ helper::time_formate($row->created_at, $vendordata->id) }}
                                                         </td>
-                                                        <td>{{ helper::currency_formate($row->amount, $vendordata->id) }}
+                                                        <td>
+                                                            @if ($row->tips > 0)
+                                                                ({{ helper::currency_formate($row->amount, $vendordata->id) }}
+                                                                +
+                                                                {{ trans('labels.tips') . ' : ' . helper::currency_formate($row->tips, $vendordata->id) }})
+                                                            @else
+                                                                {{ helper::currency_formate($row->amount, $vendordata->id) }}
+                                                            @endif
                                                         </td>
                                                         <td>
                                                             @if ($row->transaction_type == 2)

@@ -28,8 +28,10 @@
                             </h5>
                             <div class="card-body user-content-wrapper">
                                 <div class="d-flex flex-column align-items-center w-100">
-                                    <img class="mb-4 refer-img w-100"
-                                        src="{{ helper::image_path(helper::appdata($vendordata->id)->referral_image) }}">
+                                    <div class="col-md-6 col-xl-5">
+                                        <img class="mb-4 refer-img w-100"
+                                            src="{{ helper::image_path(helper::appdata($vendordata->id)->referral_image) }}">
+                                    </div>
                                     <h5 class="text-uppercase">{{ trans('labels.refer_earn') }}</h5>
                                     <p class="fs-7 text-center text-muted">{{ trans('labels.refer_note_1') }}
                                         {{ helper::currency_formate(@helper::appdata($vendordata->id)->referral_amount, $vendordata->id) }}

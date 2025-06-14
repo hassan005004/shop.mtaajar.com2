@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\admin;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tax;
@@ -7,6 +9,7 @@ use App\Models\PricingPlan;
 use App\Models\Products;
 use Illuminate\Support\Facades\Auth;
 use DB;
+
 class TaxController extends Controller
 {
     public function index(Request $request)
@@ -16,10 +19,10 @@ class TaxController extends Controller
         } else {
             $vendor_id = Auth::user()->id;
         }
-        $gettax = Tax::where('vendor_id', $vendor_id)->where('is_deleted',2)->orderBy('reorder_id')->get();
+        $gettax = Tax::where('vendor_id', $vendor_id)->where('is_deleted', 2)->orderBy('reorder_id')->get();
         return view('admin.tax.index', compact("gettax"));
     }
-    public function add(Request $request)
+    public function add()
     {
         return view('admin.tax.add');
     }
@@ -73,23 +76,19 @@ class TaxController extends Controller
             $vendor_id = Auth::user()->id;
         }
         $checktax = Tax::where('id', $request->id)->first();
-        if(Auth::user()->type == 1)
-        {
+        if (Auth::user()->type == 1) {
             $getplan = PricingPlan::where(DB::Raw("FIND_IN_SET($checktax->id, replace(tax, '|', ','))"), '>', 0)->get();
-            foreach($getplan as $plan)
-            {
+            foreach ($getplan as $plan) {
                 $tax_id = explode('|', $plan->tax);
                 $key = array_search($checktax->id, $tax_id);
                 if ($key !== false) {
                     unset($tax_id[$key]);
-                    PricingPlan::where('id',$plan->id)->update(array('tax' => implode('|', $tax_id)));
+                    PricingPlan::where('id', $plan->id)->update(array('tax' => implode('|', $tax_id)));
                 }
             }
-        }
-        else{
+        } else {
             $getproduct = Products::where(DB::Raw("FIND_IN_SET($checktax->id, replace(tax, '|', ','))"), '>', 0)->get();
-            foreach($getproduct as $product)
-            {
+            foreach ($getproduct as $product) {
                 $tax = explode('|', $product->tax);
                 $key = array_search($checktax->id, $tax);
                 if ($key !== false) {
@@ -118,5 +117,4 @@ class TaxController extends Controller
         }
         return response()->json(['status' => 1, 'msg' => trans('messages.success')], 200);
     }
-  
 }

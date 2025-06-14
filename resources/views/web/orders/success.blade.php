@@ -77,7 +77,7 @@
                 <a href="{{ URL::to(@$vendordata->slug . '/') }}" class="btn btn-fashion mb-3 py-3 w-100-m"><i
                         class="fa-regular fa-bag-shopping mx-1"></i> {{ trans('labels.continue_shopping') }} </a>
 
-                <a class="btn btn-dark mb-3 py-3 w-100-m"
+                <a class="btn btn-warning rounded-0 mb-3 py-3 fs-7 w-100-m"
                     href="{{ URL::to(@$vendordata->slug . '/find-order?order=' . $order_number) }}"><i
                         class="fa-regular fa-circle-check"></i> {{ trans('labels.track_order') }} </a>
                 @if (@helper::checkaddons('subscription'))
@@ -92,19 +92,25 @@
                             } else {
                                 $whatsapp_message = @$checkplan->whatsapp_message;
                             }
-
                         @endphp
-                        @if ($whatsapp_message == 1)
-                            <a href="https://api.whatsapp.com/send?phone={{ helper::appdata(@$vendordata->id)->whatsapp_number }}&text={{ $whmessage }}"
+                        @if (
+                            $whatsapp_message == 1 &&
+                                @whatsapp_helper::whatsapp_message_config($vendordata->id)->order_created == 1 &&
+                                @whatsapp_helper::whatsapp_message_config($vendordata->id)->message_type == 2)
+                            <a href="https://api.whatsapp.com/send?phone={{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}&text={{ $whmessage }}"
                                 class="btn btn-whatsapp btn-fashion-outline mb-3 py-3 w-100-m" target="_blank"><i
                                     class="fab fa-whatsapp me-1"></i>{{ trans('labels.whatsapp_message') }}</a>
                         @endif
                     @endif
                 @else
                     @if (@helper::checkaddons('whatsapp_message'))
-                        <a href="https://api.whatsapp.com/send?phone={{ helper::appdata(@$vendordata->id)->whatsapp_number }}&text={{ $whmessage }}"
-                            class="btn btn-whatsapp btn-fashion-outline mb-3 py-3 w-100-m" target="_blank"><i
-                                class="fab fa-whatsapp me-1"></i>{{ trans('labels.whatsapp_message') }}</a>
+                        @if (
+                            @whatsapp_helper::whatsapp_message_config($vendordata->id)->order_created == 1 &&
+                                @whatsapp_helper::whatsapp_message_config($vendordata->id)->message_type == 2)
+                            <a href="https://api.whatsapp.com/send?phone={{ whatsapp_helper::whatsapp_message_config($vendordata->id)->whatsapp_number }}&text={{ $whmessage }}"
+                                class="btn btn-whatsapp btn-fashion-outline mb-3 py-3 w-100-m" target="_blank"><i
+                                    class="fab fa-whatsapp me-1"></i>{{ trans('labels.whatsapp_message') }}</a>
+                        @endif
                     @endif
                 @endif
 
@@ -121,17 +127,19 @@
                                 $telegram_message = @$checkplan->telegram_message;
                             }
                         @endphp
-                        @if ($telegram_message == 1)
+                        @if ($telegram_message == 1 && @helper::telegramdata($vendordata->id)->order_created == 1)
                             <a href="{{ URL::to(@$vendordata->slug . '/telegram/' . $order_number . '') }}"
-                                class="btn btn-telegram btn-fashion-outline mb-3 py-3 w-100-m"><i
-                                    class="fab fa-telegram me-1"></i>{{ trans('labels.telegram_message') }}</a>
+                                class="btn btn-telegram btn-fashion-outline mb-3 py-3 w-100-m">
+                                <i class="fab fa-telegram me-1"></i>{{ trans('labels.telegram_message') }}</a>
                         @endif
                     @endif
                 @else
                     @if (@helper::checkaddons('telegram_message'))
-                        <a href="{{ URL::to(@$vendordata->slug . '/telegram/' . $order_number . '') }}"
-                            class="btn btn-telegram btn-fashion-outline mb-3 py-3 w-100-m"><i
-                                class="fab fa-telegram me-1"></i>{{ trans('labels.telegram_message') }}</a>
+                        @if (@helper::telegramdata($vendordata->id)->order_created == 1)
+                            <a href="{{ URL::to(@$vendordata->slug . '/telegram/' . $order_number . '') }}"
+                                class="btn btn-telegram btn-fashion-outline mb-3 py-3 w-100-m">
+                                <i class="fab fa-telegram me-1"></i>{{ trans('labels.telegram_message') }}</a>
+                        @endif
                     @endif
                 @endif
 

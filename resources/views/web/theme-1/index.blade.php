@@ -205,14 +205,14 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="section-heading flex-wrap pb-4">
-                                <div>
-                                    <p class="subtitle text-truncate">{{ trans('labels.homepage_product_title') }}</p>
-                                    <h4 class="section-title text-truncate">{{ trans('labels.best_selling_products') }}
+                            <div class="section-heading gap-2 pb-4">
+                                <div class="">
+                                    <p class="subtitle line-1">{{ trans('labels.homepage_product_title') }}</p>
+                                    <h4 class="section-title line-1">{{ trans('labels.best_selling_products') }}
                                     </h4>
                                 </div>
                                 <a href="{{ URL::to(@$vendordata->slug . '/products-best-selling-products') }}"
-                                    class="btn btn-sm btn-fashion">{{ trans('labels.viewall') }} <i
+                                    class="btn btn-sm btn-fashion col-auto">{{ trans('labels.viewall') }} <i
                                         class=" {{ session()->get('direction') == 2 ? 'fa-solid fa-arrow-left' : 'fa-solid fa-arrow-right' }}"></i>
                                 </a>
                             </div>
@@ -318,16 +318,16 @@
                 <div class="container">
                     <div class="row pb-4">
                         <div class="col-lg-12">
-                            <div class="section-heading flex-wrap">
-                                <div>
-                                    <p class="subtitle  text-truncate">
+                            <div class="section-heading">
+                                <div class="">
+                                    <p class="subtitle line-1">
                                         {{ trans('labels.homepage_newarrivalprodect_title') }}
                                     </p>
-                                    <h4 class="section-title  text-truncate">{{ trans('labels.new_arrival_products') }}
+                                    <h4 class="section-title line-1">{{ trans('labels.new_arrival_products') }}
                                     </h4>
                                 </div>
                                 <a href="{{ URL::to(@$vendordata->slug . '/products-newest') }}"
-                                    class="btn btn-fashion">{{ trans('labels.viewall') }} <i
+                                    class="btn btn-fashion col-auto">{{ trans('labels.viewall') }} <i
                                         class="{{ session()->get('direction') == 2 ? 'fa-solid fa-arrow-left' : 'fa-solid fa-arrow-right' }}"></i>
                                 </a>
                             </div>
@@ -336,7 +336,7 @@
                     <div class="row">
 
                         <div class="col-lg-12">
-                            <div class="row row-cols-xl-3 row-cols-lg-3 row-cols-md-2 row-cols-1 g-3 g-sm-4">
+                            <div class="row row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-1 g-3 g-sm-4">
 
                                 @foreach ($getnewarrivalproducts as $getproductdata)
                                     <div class="col">
@@ -428,7 +428,7 @@
                                                                     @if (Auth::user() && Auth::user()->type == 3)
                                                                         @php
 
-                                                                            $favorite = helper::ceckfavorite(
+                                                                            $favorite = helper::checkfavorite(
                                                                                 $getproductdata->id,
                                                                                 $vendordata->id,
                                                                                 Auth::user()->id,
@@ -538,16 +538,17 @@
                     <section class="deals bg-dark mb-5 pro-hover theme-1" id="topdeals">
                         <div class="container py-5">
                             <div id="countdown" class="mb-4"></div>
-                            <div class="d-md-flex justify-content-between align-items-center mb-4">
-                                <div>
-                                    <p class="subtitle text-white text-truncate">
+                            <div class="d-flex gap-2 justify-content-between align-items-center mb-4">
+                                <div class="">
+                                    <p class="subtitle text-white line-1">
                                         {{ trans('labels.home_page_top_deals_title') }}</p>
-                                    <h4 class="section-title text-white text-truncate">
+                                    <h4 class="section-title text-white line-1">
                                         {{ trans('labels.home_page_top_deals_subtitle') }}
                                     </h4>
                                 </div>
                                 <a href="{{ URL::to(@$vendordata->slug . '/topdeals?type=1') }}"
-                                    class="btn btn-primary rounded-0 mt-2 mt-md-0">{{ trans('labels.viewall') }} <i
+                                    class="btn btn-primary rounded-0 col-auto mt-2 mt-md-0">{{ trans('labels.viewall') }}
+                                    <i
                                         class="{{ session()->get('direction') == 2 ? 'fa-solid fa-arrow-left' : 'fa-solid fa-arrow-right' }}"></i>
                                 </a>
                             </div>
@@ -600,7 +601,7 @@
                                                                     class="circle-round wishlist-btn">
                                                                     @if (Auth::user() && Auth::user()->type == 3)
                                                                         @php
-                                                                            $favorite = helper::ceckfavorite(
+                                                                            $favorite = helper::checkfavorite(
                                                                                 $products->id,
                                                                                 $vendordata->id,
                                                                                 Auth::user()->id,
@@ -721,38 +722,40 @@
         <!-- OFFERS BANNER 3 END -->
 
         <!-- app-downlode section start -->
-        @if (!empty($appsection))
-            <section class="bg-light">
-                <div class="container">
-                    <div class="row g-xl-5 g-lg-3 g-2 align-items-center justify-content-center py-5">
-                        <div class="col-xl-5 col-lg-6 p-0 d-none d-lg-block position-relative">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <div class="u-shape-1 position-absolute top-50 start-50 translate-middle"></div>
-                                <img src="{{ helper::image_path(@$appsection->image) }}"
-                                    class="h-500px w-100 object-fit-cover " alt="">
+        @if (@helper::checkaddons('user_app'))
+            @if (!empty($appsection))
+                <section class="bg-light">
+                    <div class="container">
+                        <div class="row g-xl-5 g-lg-3 g-2 align-items-center justify-content-center py-5">
+                            <div class="col-xl-5 col-lg-6 p-0 d-none d-lg-block position-relative">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="u-shape-1 position-absolute top-50 start-50 translate-middle"></div>
+                                    <img src="{{ helper::image_path(@$appsection->image) }}"
+                                        class="h-500px w-100 object-fit-cover " alt="">
+                                </div>
                             </div>
-                        </div>
-                        <div
-                            class="col-xl-7 col-lg-6 col-12 col-md-9 m-sm-0 m-auto z-1 text-center  {{ session()->get('direction') == 2 ? 'text-lg-end' : 'text-lg-start' }}">
-                            <!-- Title -->
-                            <h2 class="m-0 fw-bold text-dark">{{ @$appsection->title }}</h2>
-                            <p class="mb-lg-5 mb-4 mt-3 text-dark">{{ @$appsection->subtitle }}</p>
-                            <!-- Button -->
-                            <div class="hstack justify-content-center justify-content-lg-start gap-3">
-                                <!-- Google play store button -->
-                                <a href="{{ @$appsection->android_link }}"> <img
-                                        src="{{ url(env('ASSETPATHURL') . 'admin-assets/images/other/google-play.svg') }}"
-                                        class="g-play" alt=""> </a>
-                                <!-- App store button -->
-                                <a href="{{ @$appsection->ios_link }}"> <img
-                                        src="{{ url(env('ASSETPATHURL') . 'admin-assets/images/other/app-store.svg') }}"
-                                        class="g-play" alt=""> </a>
+                            <div
+                                class="col-xl-7 col-lg-6 col-12 col-md-9 m-sm-0 m-auto z-1 text-center  {{ session()->get('direction') == 2 ? 'text-lg-end' : 'text-lg-start' }}">
+                                <!-- Title -->
+                                <h2 class="m-0 fw-bold text-dark">{{ @$appsection->title }}</h2>
+                                <p class="mb-lg-5 mb-4 mt-3 text-dark">{{ @$appsection->subtitle }}</p>
+                                <!-- Button -->
+                                <div class="hstack justify-content-center justify-content-lg-start gap-3">
+                                    <!-- Google play store button -->
+                                    <a href="{{ @$appsection->android_link }}"> <img
+                                            src="{{ url(env('ASSETPATHURL') . 'admin-assets/images/other/google-play.svg') }}"
+                                            class="g-play" alt=""> </a>
+                                    <!-- App store button -->
+                                    <a href="{{ @$appsection->ios_link }}"> <img
+                                            src="{{ url(env('ASSETPATHURL') . 'admin-assets/images/other/app-store.svg') }}"
+                                            class="g-play" alt=""> </a>
 
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            @endif
         @endif
 
         <!-- app-downlode section start -->

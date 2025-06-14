@@ -21,6 +21,25 @@ $(document).ready(function () {
     }
   }).change();
 
+  $('#column').on('click', function () {
+    "use strict";
+    $('#column-view').addClass('d-none');
+    $('#column').addClass('service-active');
+    $('.listing-view').removeClass('d-none');
+    $('#grid').removeClass('service-active');
+  })
+  $('#grid').on('click', function () {
+    "use strict";
+    $('#column-view').removeClass('d-none');
+    $('#column').removeClass('service-active');
+    $('.listing-view').addClass('d-none');
+    $('#grid').addClass('service-active');
+  })
+
+  $('#close-btn2').click(function () {
+    $('.view-cart-bar-2').addClass('d-none');
+  });
+
   $(".theme3-main-slaider").owlCarousel({
     loop: true,
     rtl: rtl == "2" ? true : false,
@@ -1760,6 +1779,7 @@ $(".big-view").owlCarousel({
 });
 
 $("#preview-img").owlCarousel({
+  rtl: rtl == "2" ? true : false,
   loop: true,
   margin: 10,
   nav: true,
@@ -2067,9 +2087,40 @@ $(".theme-19-product-slider").owlCarousel({
   }
 });
 
+$(".theme-19-product-slider2").owlCarousel({
+  loop: true,
+  nav: false,
+  dots: false,
+  margin: 10,
+  autoplay: true,
+  autoplayTimeout: 3000,
+  autoplaySpeed: 2000,
+  rtl: rtl == "2" ? true : false,
+  responsive: {
+    0: {
+      items: 1
+    },
+    400: {
+      items: 1
+    },
+    500: {
+      items: 1
+    },
+    768: {
+      items: 2
+    },
+    992: {
+      items: 2
+    },
+    1200: {
+      items: 3
+    }
+  }
+});
+
 $(".top-deals20").owlCarousel({
   rtl: rtl == "2" ? true : false,
-  loop: true,
+  loop: false,
   nav: false,
   autoplay: true,
   margin: 10,
@@ -2099,6 +2150,39 @@ $(".top-deals20").owlCarousel({
     }
   }
 });
+
+$(".top-deals20-2").owlCarousel({
+  rtl: rtl == "2" ? true : false,
+  loop: false,
+  nav: false,
+  autoplay: true,
+  margin: 10,
+  autoplayTimeout: 3000,
+  autoplaySpeed: 2000,
+  navText: rtl == "2" ? ["<i class='fa-solid fa-arrow-right'></i>", "<i class='fa-solid fa-arrow-left'></i>"] : ["<i class='fa-solid fa-arrow-left'></i>", "<i class='fa-solid fa-arrow-right'></i>"],
+  dots: false,
+  responsive: {
+    0: {
+      items: 1
+    },
+    400: {
+      items: 1
+    },
+    500: {
+      items: 1
+    },
+    768: {
+      items: 2
+    },
+    992: {
+      items: 2
+    },
+    1200: {
+      items: 3
+    }
+  }
+});
+
 
 $(".theme-20-category-slider").owlCarousel({
   loop: true,

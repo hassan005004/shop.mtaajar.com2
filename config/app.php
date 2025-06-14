@@ -196,6 +196,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Request' => Illuminate\Support\Facades\Request::class,
         'helper' => App\helper\helper::class,
+        'whatsapp_helper' => App\helper\whatsapp_helper::class,
         'shiprocket' => App\helper\ship_rocket::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
     ],

@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     use HasFactory;
+
+    public function products()
+    {
+        return $this->hasOne('App\Models\Products', 'id', 'product_id');
+    }
 }

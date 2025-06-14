@@ -14,6 +14,7 @@ use App\Models\FunFact;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\helper\helper;
+use App\Models\OtherSettings;
 
 class WebSettingsController extends Controller
 {
@@ -24,7 +25,8 @@ class WebSettingsController extends Controller
         } else {
             $vendor_id = Auth::user()->id;
         }
-        $settingdata =  Settings::where('vendor_id', $vendor_id)->first();
+        $settingdata = Settings::where('vendor_id', $vendor_id)->first();
+        $othersettingdata = OtherSettings::where('vendor_id', $vendor_id)->first();
         $theme = Transaction::select('themes_id')->where('vendor_id', $vendor_id)->orderByDesc('id')->first();
         $getfooterfeatures = Footerfeatures::where('vendor_id', $vendor_id)->get();
         $app = AppSettings::where('vendor_id', $vendor_id)->first();
@@ -33,7 +35,7 @@ class WebSettingsController extends Controller
         $landingdata = LandingSettings::where('vendor_id', $vendor_id)->first();
         $getsociallinks = SocialLinks::where('vendor_id', $vendor_id)->get();
 
-        return view('admin.landing.index', compact('settingdata', 'theme', 'app', 'funfacts', 'landingdata', 'getfooterfeatures', 'getsociallinks'));
+        return view('admin.landing.index', compact('settingdata', 'othersettingdata', 'theme', 'app', 'funfacts', 'landingdata', 'getfooterfeatures', 'getsociallinks'));
     }
     public function themeupdate(Request $request)
     {
@@ -332,6 +334,7 @@ class WebSettingsController extends Controller
                     $request->landing_home_banner->move(storage_path('app/public/admin-assets/images/banners/'), $bannerimage);
                     $landingsettings->landing_home_banner = $bannerimage;
                 }
+                
                 if ($request->hasfile('testimonial_image')) {
 
                     $validator = Validator::make($request->all(), [
@@ -350,6 +353,7 @@ class WebSettingsController extends Controller
                     $request->testimonial_image->move(storage_path('app/public/admin-assets/images/testimonials/'), $bannerimage);
                     $landingsettings->testimonial_image = $bannerimage;
                 }
+
                 if ($request->hasfile('subscribe_image')) {
 
                     $validator = Validator::make($request->all(), [
@@ -647,6 +651,24 @@ class WebSettingsController extends Controller
     public function delete_sociallinks(Request $request)
     {
         SocialLinks::where('id', $request->id)->delete();
+        return redirect()->back()->with('success', trans('messages.success'));
+    }
+
+    public function tips_settings(Request $request)
+    {
+        if (Auth::user()->type == 4) {
+            $vendor_id = Auth::user()->vendor_id;
+        } else {
+            $vendor_id = Auth::user()->id;
+        }
+
+        $othersettingsdata = OtherSettings::where('vendor_id', $vendor_id)->first();
+        if (empty($othersettingdata)) {
+            $othersettingdata = new OtherSettings();
+            $othersettingdata->vendor_id = $vendor_id;
+        }
+        $othersettingsdata->tips_settings = isset($request->tips_settings) ? 1 : 2;
+        $othersettingsdata->save();
         return redirect()->back()->with('success', trans('messages.success'));
     }
 

@@ -481,9 +481,9 @@
     }
 
     .js-main-card {
-        display: flex;
+        /* display: flex;
         justify-content: center;
-        margin: auto;
+        margin: auto; */
         width: 100%;
     }
 
@@ -762,6 +762,48 @@
 @media only screen and (max-width: 500px) {
     .g-recaptcha {
         transform:scale(0.77);
-        transform-origin:0 0;
+        /* transform-origin:0 0; */
+    }
+
+    #offcanvaslanding{
+        width: 95% !important;
+    }
+}
+@media (min-width: 321px) and (max-width: 375px) {
+    .smartphone {
+        position: relative;
+        width: 347px !important;
+        height: calc(100vh - 60px);
+        margin: auto;
+        /* border: 16px black solid; */
+        border-top-width: 60px;
+        border-bottom-width: 60px;
+        border-radius: 36px;
+    }
+}
+
+@media (min-width: 200px) and (max-width: 320px) {
+    .smartphone {
+        position: relative;
+        width: 100% !important;
+        height: calc(100vh - 60px);
+        margin: auto;
+        border: 2px black solid;
+        border-top-width: 60px;
+        border-bottom-width: 60px;
+        border-radius: 36px;
+    }
+}
+
+@media (min-width: 321px) and (max-width: 375px) {
+    .smartphone {
+        position: relative;
+        width: 347px !important;
+        height: calc(100vh - 60px);
+        margin: auto;
+        /* border: 16px black solid; */
+        border-top-width: 60px;
+        border-bottom-width: 60px;
+        border-radius: 36px;
     }
 }

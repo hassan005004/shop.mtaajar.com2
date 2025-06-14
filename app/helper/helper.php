@@ -31,16 +31,18 @@ use App\Models\AgeVerification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use URL;
-use App;
 use App\Models\Footerfeatures;
 use App\Models\OtherSettings;
 use App\Models\Promocode;
+use App\Models\TelegramMessage;
+use App\Models\WhatsappMessage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Config;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use File;
+use Illuminate\Support\Facades\App;
 
 class helper
 {
@@ -69,7 +71,7 @@ class helper
     public static function otherappdata($vendor_id)
     {
         if (file_exists(storage_path('installed'))) {
-            
+
             $host = $_SERVER['HTTP_HOST'];
             if ($host  ==  env('WEBSITE_HOST')) {
                 $data = OtherSettings::first();
@@ -93,6 +95,13 @@ class helper
             exit;
         }
     }
+
+    public static function telegramdata($vendor_id)
+    {
+        $data = TelegramMessage::where('vendor_id', $vendor_id)->first();
+        return $data;
+    }
+
     public static function getsociallinks($vendor_id)
     {
         $host = $_SERVER['HTTP_HOST'];
@@ -729,8 +738,6 @@ class helper
             $vdata = $vendordata->vendor_id;
             return Footerfeatures::select('id', 'icon', 'title', 'description')->where('vendor_id', $vdata)->get();
         }
-        
-        
     }
 
     public static function stripe_data($vendor_id)
@@ -858,7 +865,7 @@ class helper
         }
         return $data;
     }
-    public static function createorder($vendor_slug, $session_id, $user_id, $user_name, $user_email, $user_mobile, $transaction_type, $transaction_id, $billing_address, $billing_landmark, $billing_postal_code, $billing_city, $billing_state, $billing_country, $shipping_address, $shipping_landmark, $shipping_postal_code, $shipping_city, $shipping_state, $shipping_country, $shipping_area, $delivery_charge, $grand_total, $sub_total, $tax_amount, $tax_name, $notes, $offer_code, $offer_amount, $filename, $order_type)
+    public static function createorder($vendor_slug, $session_id, $user_id, $user_name, $user_email, $user_mobile, $transaction_type, $transaction_id, $billing_address, $billing_landmark, $billing_postal_code, $billing_city, $billing_state, $billing_country, $shipping_address, $shipping_landmark, $shipping_postal_code, $shipping_city, $shipping_state, $shipping_country, $shipping_area, $delivery_charge, $grand_total, $sub_total, $tax_amount, $tax_name, $notes, $offer_code, $offer_amount, $filename, $order_type, $tips, $buynow)
     {
         try {
 
@@ -911,9 +918,9 @@ class helper
                 $order->user_id = $user_id;
             }
             if ($user_id > 0) {
-                $checkcart = Cart::where('vendor_id', @$vdata)->where('user_id', $user_id)->get();
+                $checkcart = Cart::where('vendor_id', @$vdata)->where('user_id', $user_id)->where('buynow', $buynow)->get();
             } else {
-                $checkcart = Cart::where('vendor_id', @$vdata)->where('session_id', $session_id)->get();
+                $checkcart = Cart::where('vendor_id', @$vdata)->where('session_id', $session_id)->where('buynow', $buynow)->get();
             }
 
             if ($checkcart->count() > 0) {
@@ -947,7 +954,8 @@ class helper
                     $order->transaction_id = "";
                 }
                 $order->delivery_charge = $delivery_charge;
-                $order->grand_total = $grand_total;
+                $order->grand_total = $grand_total - $tips;
+                $order->tips = $tips;
                 $order->sub_total = $sub_total;
                 $order->tax_amount = $tax_amount;
                 $order->tax_name = $tax_name;
@@ -979,7 +987,8 @@ class helper
                         $transaction->order_number = $order_number;
                         $transaction->payment_type = 16;
                         $transaction->transaction_type = 2;
-                        $transaction->amount = $grand_total;
+                        $transaction->amount = $grand_total - $tips;
+                        $transaction->tips = $tips;
                         if ($transaction->save()) {
                             $checkuser->save();
                         }
@@ -1045,85 +1054,7 @@ class helper
         }
     }
 
-
-    public static function whatsappmessage($order_number, $vendor_slug, $vendordata)
-    {
-        $pagee[] = "";
-        $payment_type = "-";
-        $payment_status = "";
-
-        $host = $_SERVER['HTTP_HOST'];
-        if ($host  ==  env('WEBSITE_HOST')) {
-            $vendordata = helper::vendordata($vendor_slug);
-
-            $vdata = $vendordata->id;
-        }
-        // if the current host doesn't contain the website domain (meaning, custom domain)
-        else {
-            $vendordata = Settings::where('custom_domain', $host)->first();
-
-            $vdata = $vendordata->vendor_id;
-        }
-
-        $getorder = Order::where('order_number', $order_number)->where('vendor_id', $vdata)->first();
-        if ($getorder->payment_status == "1") {
-            $payment_status = "UnPaid";
-        }
-        if ($getorder->payment_status == "2") {
-            $payment_status = "Paid";
-        }
-
-        $data = OrderDetails::where('order_id', $getorder->id)->get();
-        foreach ($data as $value) {
-            if ($value['variation_id'] != "") {
-                $item_p =  $value['product_price'];
-                $variantsdata = '(' . $value['variation_name'] . ')';
-            } else {
-                $variantsdata = "";
-                $item_p =  $value['product_price'];
-            }
-            // $extras_id = explode(",", $value['extras_id']);
-            // $extras_name = explode(",", $value['extras_name']);
-            // $extras_price = explode(",", $value['extras_price']);
-            $item_message = helper::appdata($vendordata->id)->item_message;
-            $itemvar = ["{qty}", "{item_name}", "{variantsdata}", "{item_price}"];
-            $newitemvar   = [$value['qty'], $value['product_name'], $variantsdata, helper::currency_formate($item_p, $vdata)];
-            $pagee[] = str_replace($itemvar, $newitemvar, $item_message);
-            // if ($value['extras_id'] != "") {
-            //     foreach ($extras_id as $key =>  $addons) {
-            //         $pagee[] .= "👉" . $extras_name[$key] . ':' . helper::currency_formate($extras_price[$key], $vdata) . '%0a';
-            //     }
-            // }
-        }
-
-        $items = implode(",", $pagee);
-        $itemlist = str_replace(',', '%0a', $items);
-        $tax = explode("|", $getorder['tax_amount']);
-        $tax_name = explode("|", $getorder['tax_name']);
-
-        $tax_data[] = "";
-        if ($tax != "") {
-            foreach ($tax as $key => $tax_value) {
-                @$tax_data[] .= "👉" . $tax_name[$key] . ' : ' . helper::currency_formate((float)$tax[$key], $vdata) . '%0a';
-            }
-        }
-        $tdata = implode(",", $tax_data);
-
-
-        $tax_val = str_replace(',', '%0a', $tdata);
-        if (helper::appdata($vdata)->product_type == 1) {
-            $var = ["{order_no}", "{payment_status}", "{item_variable}", "{sub_total}", "{total_tax}", "{offer_code}", "{discount_amount}", "{delivery_charge}", "{grand_total}", "{notes}", "{customer_name}", "{customer_mobile}", "{customer_email}", "{billing_address}", "{billing_city}", "{billing_state}", '{billing_country}', "{billing_landmark}", "{billing_postal_code}", "{shipping_address}", "{shipping_city}", "{shipping_state}", "{shipping_country}", "{shipping_postal_code}", "{shipping_landmark}", "{payment_type}", "{track_order_url}", "{store_url}", "{store_name}", "{date}", "{time}"];
-            $newvar   = [$getorder->order_number, $payment_status, $itemlist, helper::currency_formate($getorder->sub_total, $vdata), $tax_val, $getorder->offer_code, helper::currency_formate($getorder->offer_amount, $vdata), helper::currency_formate($getorder->delivery_charge, $vdata), helper::currency_formate($getorder->grand_total, $vdata), $getorder->notes, $getorder->user_name, $getorder->user_mobile, $getorder->user_email, $getorder->billing_address, $getorder->billing_city, $getorder->billing_state, $getorder->billing_country, $getorder->billing_landmark, $getorder->billing_postal_code,  $getorder->shipping_address, $getorder->shipping_city, $getorder->shipping_state, $getorder->shipping_country, $getorder->shipping_postal_code, $getorder->shipping_landmark, @helper::getpayment($getorder->transaction_type, $vdata)->payment_name, URL::to($vendordata->slug . '/find-order?order=' . $order_number), URL::to($vendordata->slug), $vendordata->name, helper::date_formate($getorder->created_at, $vdata), helper::time_formate($getorder->created_at, $vdata)];
-        } else {
-            $var = ["{order_no}", "{payment_status}", "{item_variable}", "{sub_total}", "{total_tax}", "{offer_code}", "{discount_amount}", "{grand_total}", "{notes}", "{customer_name}", "{customer_mobile}", "{customer_email}", "{payment_type}", "{track_order_url}", "{store_url}", "{store_name}", "{date}", "{time}"];
-            $newvar   = [$getorder->order_number, $payment_status, $itemlist, helper::currency_formate($getorder->sub_total, $vdata), $tax_val, $getorder->offer_code, helper::currency_formate($getorder->offer_amount, $vdata), helper::currency_formate($getorder->grand_total, $vdata), $vendordata->name, $getorder->notes, $getorder->user_name, $getorder->user_mobile, $getorder->user_email, @helper::getpayment($getorder->transaction_type, $vdata)->payment_name, URL::to($vendordata->slug . '/find-order?order=' . $order_number), URL::to($vendordata->slug), $vendordata->name, helper::date_formate($getorder->created_at, $vdata), helper::time_formate($getorder->created_at, $vdata)];
-        }
-
-        $whmessage = str_replace($var, $newvar, str_replace("\n", "%0a", helper::appdata($vdata)->whatsapp_message));
-
-        return $whmessage;
-    }
-    public static function ceckfavorite($product_id, $vendor_id, $user_id)
+    public static function checkfavorite($product_id, $vendor_id, $user_id)
     {
         $getfavorite = Favorite::where('vendor_id', $vendor_id)->where('user_id', $user_id)->where('product_id', $product_id)->first();
         return $getfavorite;
@@ -1233,105 +1164,33 @@ class helper
                 $gateway->save();
             }
 
-            $messagenotification = "Hi, 
-I would like to place an order 👇
+            $whatsappdata = WhatsappMessage::where('vendor_id', 1)->first();
+            $whatsapp = new WhatsappMessage();
+            $whatsapp->vendor_id = $vendor_id;
+            $whatsapp->item_message = $whatsappdata->item_message;
+            $whatsapp->order_whatsapp_message = $whatsappdata->order_whatsapp_message;
+            $whatsapp->order_status_message = $whatsappdata->order_status_message;
+            $whatsapp->whatsapp_number = $whatsappdata->whatsapp_number;
+            $whatsapp->whatsapp_phone_number_id = $whatsappdata->whatsapp_phone_number_id;
+            $whatsapp->whatsapp_access_token = $whatsappdata->whatsapp_access_token;
+            $whatsapp->whatsapp_chat_on_off = $whatsappdata->whatsapp_chat_on_off;
+            $whatsapp->whatsapp_mobile_view_on_off = $whatsappdata->whatsapp_mobile_view_on_off;
+            $whatsapp->whatsapp_chat_position = $whatsappdata->whatsapp_chat_position;
+            $whatsapp->order_created = $whatsappdata->order_created;
+            $whatsapp->status_change = $whatsappdata->status_change;
+            $whatsapp->message_type = $whatsappdata->message_type;
+            $whatsapp->save();
 
-Order No: {order_no}
----------------------------
-{item_variable}
----------------------------
-👉Subtotal : {sub_total}
-👉Tax : {total_tax}
-👉Delivery charge : {delivery_charge}
-👉Discount : - {discount_amount}
----------------------------
-📃 Total : {grand_total}
----------------------------
-📄 Comment : {notes}
-✅ Customer Info
----------------------------
-Customer name : {customer_name}
-Customer email: {customer_email}
-Customer phone : {customer_mobile}
----------------------------
-📍 Billing Details
-Address : {billing_address}, {billing_landmark}, {billing_postal_code}, {billing_city}, {billing_state}, {billing_country}.
----------------------------
-📍 Shipping Details
-Address : {shipping_address}, {shipping_landmark}, {shipping_postal_code}, {shipping_city}, {shipping_state}, {shipping_country}.
----------------------------
-🗓️Date : {date}
-⏱️Time : {time}
----------------------------
-💳 Payment type : {payment_type}
+            $telegramdata = TelegramMessage::where('vendor_id', 1)->first();
+            $telegram = new TelegramMessage();
+            $telegram->vendor_id = $vendor_id;
+            $telegram->item_message = $telegramdata->item_message;
+            $telegram->telegram_message = $telegramdata->telegram_message;
+            $telegram->order_created = $telegramdata->order_created;
+            $telegram->telegram_access_token = $telegramdata->telegram_access_token;
+            $telegram->telegram_chat_id = $telegramdata->telegram_chat_id;
+            $telegram->save();
 
-{store_name} will confirm your order upon receiving the message.
-
-Track your order 👇
-{track_order_url}
-
-Click here for next order 👇
-{store_url}
-
-Thanks for the Order 🥳";
-
-            $vendorcontactemailmessage = "Dear {vendorname},
-
-You have received new inquiry
-
-Full Name : {username}
-
-Email : {useremail}
-
-Mobile : {usermobile}
-
-Message : {usermessage}";
-
-            $neworderinvoicemailmessage = "Dear {customername},
-
-We are pleased to confirm that we have received your Order.
-
-Order details
-
-Order number : #{ordernumber}
-Order Date : {orderdate}
-Grand Total : {grandtotal}
-
-Click Here : {track_order_url}
-
-Thank you for choosing.
-
-Sincerely,
-{vendorname}";
-
-            $vendorneworderemailmessage = "Dear {vendorname},
-
-We are writing to confirm that you have received new Order.
-
-Order details
-
-Order number : #{ordernumber}
-Order Date : {orderdate}
-Grand Total : {grandtotal}
-
-Sincerely,
-{customername}";
-
-            $orderstatusemailmessage = "Dear {customername},
-
-I am writing to inform you that {status_message}
-
-Sincerely
-{vendorname}";
-
-            $userreferralearningmessage = "Dear {referral_user},
-
-Your friend {new_user} has used your referral code to register with {company_name}.
-You have earned {referral_amount} referral amount in your wallet.
-
-Note : Do not reply to this notification message,this message was auto-generated by the sender's security system.
-
-All Rights Reserved.";
             $landingsettings = LandingSettings::where('vendor_id', 1)->first();
             $data = new Settings();
 
@@ -1348,10 +1207,6 @@ All Rights Reserved.";
             $data->web_title = helper::appdata("")->web_title;
             $data->copyright = helper::appdata("")->copyright;
             $data->vendor_id = $vendor_id;
-            $data->whatsapp_message = $messagenotification;
-            $data->telegram_message = $messagenotification;
-            $data->whatsapp_number = $vendor_mobile;
-            $data->item_message = "🔵{item_name} X  {qty}  {variantsdata} - {item_price}";
             $data->product_type = $product_type;
             $data->decimal_separator = $rec->decimal_separator;
             $data->currency_formate = $rec->currency_formate;
@@ -1364,19 +1219,19 @@ All Rights Reserved.";
             $data->primary_color = $landingsettings->primary_color;
             $data->secondary_color = $landingsettings->secondary_color;
             $data->secondary_color = $landingsettings->secondary_color;
-            $data->contact_email_message = $vendorcontactemailmessage;
-            $data->new_order_invoice_email_message = $neworderinvoicemailmessage;
-            $data->vendor_new_order_email_message = $vendorneworderemailmessage;
-            $data->order_status_email_message = $orderstatusemailmessage;
-            $data->referral_earning_email_message = $userreferralearningmessage;
+            $data->contact_email_message = $rec->contact_email_message;
+            $data->new_order_invoice_email_message = $rec->new_order_invoice_email_message;
+            $data->vendor_new_order_email_message = $rec->vendor_new_order_email_message;
+            $data->order_status_email_message = $rec->order_status_email_message;
+            $data->referral_earning_email_message = $rec->referral_earning_email_message;
+            $data->og_image = "default.png";
             $data->save();
+
             $emaildata = helper::emailconfigration(helper::appdata('')->id);
             Config::set('mail', $emaildata);
             helper::send_mail_vendor_register($user);
             return $vendor_id;
-            $data->og_image = "default.png";
         } catch (\Throwable $th) {
-
             return $th;
         }
     }
@@ -1519,7 +1374,7 @@ All Rights Reserved.";
     }
     public static function paymentlist($vendor_id)
     {
-        
+
         $host = $_SERVER['HTTP_HOST'];
         if ($host  ==  env('WEBSITE_HOST')) {
             $payment = Payment::where('vendor_id', $vendor_id)->where('is_available', 1)->where('is_activate', 1)->orderBy('reorder_id')->get();
@@ -1530,7 +1385,7 @@ All Rights Reserved.";
             $vdata = $vendordata->vendor_id;
             $payment = Payment::where('vendor_id', $vdata)->where('is_available', 1)->where('is_activate', 1)->orderBy('reorder_id')->get();
         }
-    
+
         return $payment;
     }
 
@@ -1751,7 +1606,7 @@ All Rights Reserved.";
             $vdata = $vendordata->vendor_id;
             $agedetails = AgeVerification::where('vendor_id', $vdata)->first();
         }
-        
+
         return $agedetails;
     }
 

@@ -11,7 +11,12 @@ class FeaturesController extends Controller
 {
     public function index(Request $request)
     {
-        $features = Features::where('vendor_id', Auth::user()->id)->orderBy('reorder_id')->get();
+        if (Auth::user()->type == 4) {
+            $vendor_id = Auth::user()->vendor_id;
+        } else {
+            $vendor_id = Auth::user()->id;
+        }
+        $features = Features::where('vendor_id', $vendor_id)->orderBy('reorder_id')->get();
         return view('admin.features.index', compact('features'));
     }
     public function add()
@@ -20,6 +25,11 @@ class FeaturesController extends Controller
     }
     public function save(Request $request)
     {
+        if (Auth::user()->type == 4) {
+            $vendor_id = Auth::user()->vendor_id;
+        } else {
+            $vendor_id = Auth::user()->id;
+        }
         $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -30,7 +40,7 @@ class FeaturesController extends Controller
             'image.required' => trans('messages.image_required'),
         ]);
         $features = new Features();
-        $features->vendor_id = Auth::user()->id;
+        $features->vendor_id = $vendor_id;
         $features->title = $request->title;
         $features->description = $request->description;
         if ($request->has('image')) {
@@ -57,7 +67,6 @@ class FeaturesController extends Controller
             'description.required' => trans('messages.description_required'),
         ]);
         $editfeature = Features::where('id', $request->id)->first();
-        $editfeature->vendor_id = Auth::user()->id;
         $editfeature->title = $request->title;
         $editfeature->description = $request->description;
         if ($request->has('image')) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\user;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\helper\helper;
+use App\helper\whatsapp_helper;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Cart;
@@ -125,7 +126,7 @@ class OrderController extends Controller
             $data = json_decode(json_encode($data), true);
             if ($data['original']['status'] == 1) {
                 if (SystemAddons::where('unique_identifier', 'whatsapp_message')->first() != null && SystemAddons::where('unique_identifier', 'whatsapp_message')->first()->activated == 1) {
-                    $whmessage = helper::whatsappmessage($data['original']['order_number'], $vendordata->slug, $vendordata);
+                    $whmessage = whatsapp_helper::whatsappmessage($data['original']['order_number'], $vendordata->slug, $vendordata);
                     $whatsapp_number = helper::appdata($vendordata->id)->whatsapp_number;
                 } else {
                     $whmessage = "";

@@ -12,7 +12,7 @@ use App\Http\Controllers\admin\PaymentController;
 use App\Http\Controllers\admin\StoreCategoryController;
 use App\Http\Controllers\admin\TransactionController;
 use App\Http\Controllers\admin\BannerController;
-use App\Http\Controllers\addons\BlogController;
+use App\Http\Controllers\addons\included\BlogController;
 use App\Http\Controllers\admin\HowItWorkController;
 use App\Http\Controllers\admin\ThemeController;
 use App\Http\Controllers\admin\ShippingareaController;
@@ -159,9 +159,9 @@ if ($host == env('WEBSITE_HOST')) {
                 Route::group(
                     ['prefix' => 'orders'],
                     function () {
-                        Route::get('/invoice/{order_number}', [OrderController::class, 'invoice']);
+                        Route::get('/invoice/{vendor_id}/{order_number}', [OrderController::class, 'invoice']);
                         Route::get('/print/{order_number}', [OrderController::class, 'print']);
-                        Route::get('/generatepdf/{order_number}', [OrderController::class, 'generatepdf']);
+                        Route::get('/generatepdf/{vendor_id}/{order_number}', [OrderController::class, 'generatepdf']);
                         Route::post('/customerinfo', [OrderController::class, 'customerinfo']);
                         Route::post('/vendor_note', [OrderController::class, 'vendor_note']);
                     }
@@ -172,6 +172,7 @@ if ($host == env('WEBSITE_HOST')) {
                 Route::post('/themeupdate', [WebSettingsController::class, 'themeupdate']);
                 Route::post('/seo_update', [WebSettingsController::class, 'seo_update']);
                 Route::post('/footer_features/update', [WebSettingsController::class, 'footer_features_update']);
+                Route::post('/tips_settings/update', [WebSettingsController::class, 'tips_settings']);
 
                 Route::post('/contact_settings/update', [WebSettingsController::class, 'contact_settings']);
                 Route::post('/other/update', [WebSettingsController::class, 'other_update']);
@@ -345,7 +346,7 @@ if ($host == env('WEBSITE_HOST')) {
                                 Route::post('/payment_status-{status}', [OrderController::class, 'payment_status']);
                             }
                         );
-                         // Shipping-area
+                        // Shipping-area
                         Route::group(
                             ['prefix' => 'shipping-area'],
                             function () {
@@ -432,7 +433,11 @@ if ($host == env('WEBSITE_HOST')) {
                                 Route::post('/reorder_extras', [GlobalExtrasController::class, 'reorder_extras']);
                             }
                         );
-
+                        //shipping
+                        Route::group(['prefix' => 'shipping'], function () {
+                            Route::get('/', [OtherPagesController::class, 'shippingindex']);
+                            Route::post('/savecontent', [OtherPagesController::class, 'savecontent']);
+                        });
                         // Plan
                         Route::group(
                             ['prefix' => 'plan'],
@@ -556,6 +561,7 @@ Route::post('cart/qtyupdate', [WebProductController::class, 'qtyupdate']);
 Route::group(['namespace' => "web", 'prefix' => $prefix, 'middleware' => 'FrontMiddleware'], function () {
 
     Route::get('/', [HomeController::class, 'index']);
+    Route::get('/pwa', [HomeController::class, 'pwaindex']);
     Route::get('/categories', [HomeController::class, 'categories']);
     Route::get('/checkvendor', [HomeController::class, 'checkvendor']);
 

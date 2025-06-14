@@ -21,11 +21,11 @@
     @if (@helper::checkaddons('subscription'))
         @if (@helper::checkaddons('blog'))
             @php
-                $checkplan = App\Models\Transaction::where('vendor_id', @$vdata)
+                $checkplan = App\Models\Transaction::where('vendor_id', $vendordata->id)
                     ->orderByDesc('id')
                     ->first();
-                $user = App\Models\User::where('id', @$vdata)->first();
-                if (@$user->allow_without_subscription == 1) {
+                $user = App\Models\User::where('id', $vendordata->id)->first();
+                if ($user->allow_without_subscription == 1) {
                     $blogs = 1;
                 } else {
                     $blogs = @$checkplan->blogs;

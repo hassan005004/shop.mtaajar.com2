@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\helper\helper;
+use App\helper\whatsapp_helper;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\OrderDetails;
@@ -12,8 +13,8 @@ use App\Models\CustomStatus;
 use App\Models\Variation;
 use App\Models\Products;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
-use PDF;
 use Config;
 
 class OrderController extends Controller
@@ -109,7 +110,7 @@ class OrderController extends Controller
             }
             $vendor = User::select('id', 'name')->where('id', $orderdata->vendor_id)->first();
 
-            $defaultsatus = CustomStatus::where('vendor_id', $orderdata->vendor_id)->where('order_type', $orderdata->order_type)->where('type', $request->type)->where('is_available', 1)->where('is_deleted', 2)->first();
+            $defaultsatus = CustomStatus::where('id', $request->status)->where('vendor_id', $orderdata->vendor_id)->where('order_type', $orderdata->order_type)->where('type', $request->type)->where('is_available', 1)->where('is_deleted', 2)->first();
 
             if (helper::appdata($orderdata->vendor_id)->product_type == 1) {
                 if (empty($defaultsatus) && $defaultsatus == null) {
@@ -118,8 +119,13 @@ class OrderController extends Controller
 
                     $emaildata = helper::emailconfigration($vendor->id);
                     Config::set('mail', $emaildata);
-                    $status_email = helper::order_status_email($orderdata->user_email, $orderdata->user_name, $title, $message_text, $vendor);
+                    helper::order_status_email($orderdata->user_email, $orderdata->user_name, $title, $message_text, $vendor);
 
+                    if (@helper::checkaddons('whatsapp_message')) {
+                        if (@whatsapp_helper::whatsapp_message_config($orderdata->vendor_id)->order_status_change == 1) {
+                            whatsapp_helper::orderstatusupdatemessage($orderdata->order_number, $message_text, $orderdata->vendor_id);
+                        }
+                    }
                     if ($orderdata->transaction_type == 6 && $request->type == 3) {
                         $orderdata->payment_status = 2;
                     }
@@ -148,19 +154,7 @@ class OrderController extends Controller
     }
     public function invoice(Request $request)
     {
-        if (Auth::user()->type == 1) {
-            $getorderdata = Order::where('order_number', $request->order_number)->first();
-        } else {
-            if (Auth::user()->type == 4) {
-                $vendor_id = Auth::user()->vendor_id;
-            } else {
-                $vendor_id = Auth::user()->id;
-            }
-
-            $getorderdata = Order::where('order_number', $request->order_number)->where('vendor_id', $vendor_id)->first();
-        }
-
-
+        $getorderdata = Order::where('order_number', $request->order_number)->where('vendor_id', $request->vendor_id)->first();
         if (empty($getorderdata)) {
             abort(404);
         }
@@ -184,14 +178,9 @@ class OrderController extends Controller
 
     public function generatepdf(Request $request)
     {
-        if (Auth::user()->type == 4) {
-            $vendor_id = Auth::user()->vendor_id;
-        } else {
-            $vendor_id = Auth::user()->id;
-        }
-        $getorderdata = Order::where('order_number', $request->order_number)->where('vendor_id', $vendor_id)->first();
+        $getorderdata = Order::where('order_number', $request->order_number)->where('vendor_id', $request->vendor_id)->first();
         $ordersdetails = OrderDetails::where('order_id', $getorderdata->id)->get();
-        $pdf = PDF::loadView('admin.orders.invoicepdf', ['getorderdata' => $getorderdata, 'ordersdetails' => $ordersdetails]);
+        $pdf = Pdf::loadView('admin.orders.invoicepdf', ['getorderdata' => $getorderdata, 'ordersdetails' => $ordersdetails]);
         return $pdf->download('orderinvoice.pdf');
     }
     public function customerinfo(Request $request)

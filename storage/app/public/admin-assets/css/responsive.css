@@ -377,3 +377,12 @@
         display: block;
     }
 }
+
+@media only screen and (min-width: 200px) and (max-width: 575px) {
+    .lag-btn .dropdown-menu {
+        --bs-dropdown-min-width: 8rem !important;
+        padding: 0px 0px !important;
+        overflow: hidden !important;
+        font-size: 12px !important;
+    }
+}

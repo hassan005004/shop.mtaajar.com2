@@ -550,7 +550,8 @@
                                             @endif
                                         @endif
                                         @if ($plan->plan_type == 2)
-                                        {{ $plan->days }} {{$plan->days > 1 ?  trans('labels.days') :trans('labels.day') }}
+                                            {{ $plan->days }}
+                                            {{ $plan->days > 1 ? trans('labels.days') : trans('labels.day') }}
                                         @endif
 
                                     </h6>
@@ -567,13 +568,14 @@
                                             <li class="list-item d-flex"> <i class="fa-regular fa-circle-check"></i>
                                                 <p class="ms-2">
                                                     {{ $plan->order_limit == -1 ? 'Unlimited' : $plan->order_limit }}
-                                                    {{ $plan->order_limit > 1 || $plan->order_limit == -1 ? trans('labels.products') : trans('labels.product') }}</p>
+                                                    {{ $plan->order_limit > 1 || $plan->order_limit == -1 ? trans('labels.products') : trans('labels.product') }}
+                                                </p>
                                             </li>
 
                                             <li class="list-item d-flex"> <i class="fa-regular fa-circle-check"></i>
                                                 <p class="ms-2">
                                                     {{ $plan->appointment_limit == -1 ? 'Unlimited' : $plan->appointment_limit }}
-                                                    {{ $plan->appointment_limit > 1 || $plan->appointment_limit == -1  ? trans('labels.orders') : trans('labels.order') }}
+                                                    {{ $plan->appointment_limit > 1 || $plan->appointment_limit == -1 ? trans('labels.orders') : trans('labels.order') }}
                                             </li>
                                             @php
                                                 $themes = [];
@@ -668,7 +670,7 @@
     <script>
         AOS.init();
     </script>
-{{-- 
+    {{-- 
     <script>
         $(window).on('scroll', function() {
 

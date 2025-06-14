@@ -271,7 +271,8 @@ $("#top-deals-16").owlCarousel({
   dots: false,
   responsive: {
     0: {
-      items: 1
+      margin: 5,
+      items: 2
     },
     410: {
       items: 2
@@ -405,6 +406,39 @@ $("#top-deals4").owlCarousel({
   }
 });
 
+$("#top-deals12").owlCarousel({
+  rtl: rtl == "2" ? true : false,
+  loop: false,
+  nav: true,
+  navText: rtl == "2" ? ["<i class='fa-solid fa-arrow-right'></i>", "<i class='fa-solid fa-arrow-left'></i>"] : ["<i class='fa-solid fa-arrow-left'></i>", "<i class='fa-solid fa-arrow-right'></i>"],
+  dots: false,
+  responsive: {
+    300: {
+      items: 2,
+      margin: 10
+    },
+
+    500: {
+      items: 2,
+      margin: 10
+    },
+
+    600: {
+      items: 3,
+      margin: 10
+    },
+
+    1000: {
+      items: 3,
+      margin: 15
+    },
+
+    1400: {
+      items: 4,
+      margin: 15
+    }
+  }
+});
 
 $("#top-deals5").owlCarousel({
   rtl: rtl == "2" ? true : false,
@@ -505,6 +539,39 @@ $("#top-deals20").owlCarousel({
   }
 });
 
+$("#top-deals15").owlCarousel({
+  rtl: rtl == "2" ? true : false,
+  loop: true,
+  nav: false,
+  autoplay: true,
+  margin: 10,
+  autoplayTimeout: 3000,
+  autoplaySpeed: 2000,
+  navText: rtl == "2" ? ["<i class='fa-solid fa-arrow-right'></i>", "<i class='fa-solid fa-arrow-left'></i>"] : ["<i class='fa-solid fa-arrow-left'></i>", "<i class='fa-solid fa-arrow-right'></i>"],
+  dots: false,
+  responsive: {
+    0: {
+      items: 2,
+    },
+
+    380: {
+      items: 2,
+    },
+
+    600: {
+      items: 3,
+    },
+
+    1000: {
+      items: 3,
+    },
+
+    1400: {
+      items: 4,
+    }
+  }
+});
+
 $("#top-deals18").owlCarousel({
   rtl: rtl == "2" ? true : false,
   loop: true,
@@ -537,8 +604,6 @@ $("#top-deals18").owlCarousel({
     }
   }
 });
-
-
 $("#top-deals6").owlCarousel({
   rtl: rtl == "2" ? true : false,
 
@@ -990,7 +1055,6 @@ $("#testimonial9").owlCarousel({
   }
 });
 
-
 // top deals start
 $(".carousel-items-2").owlCarousel({
   rtl: rtl == "2" ? true : false,
@@ -1158,9 +1222,6 @@ $(".carousel-testimonial").owlCarousel({
     }
   }
 });
-
-
-
 $(".testimonial-12").owlCarousel({
   rtl: rtl == "2" ? true : false,
   loop: false,
