@@ -209,11 +209,33 @@ function copyToClipboard(element) {
     }
   });
 }
+$("#shipping_area").on("change", function () {
+  "use strict";
+
+  $(".delivery-charge-section").removeClass("d-none");
+
+  let delivery_charge = parseFloat(
+    $(this).find(":selected").attr("data-delivery-charge")
+  );
+
+  $(".delivery_charge").html(currency_formate(delivery_charge));
+  let sub_total = parseFloat($("#sub_total").val());
+
+  let offer_amount = parseFloat($("#discount_amount").val());
+
+  let tax_amount = parseFloat($("#totaltax").val());
+
+  let grand_total = sub_total - offer_amount + tax_amount + delivery_charge;
+
+  $("#delivery_charge").val(delivery_charge);
+
+  $("#grand_total").val(grand_total);
+
+  $("#total_amount").text(currency_formate(grand_total));
+});
 
 // payment_type = COD : 1,RazorPay : 2, Stripe : 3, Flutterwave : 4, Paystack : 5, Mercado Pago : 7, PayPal : 8, MyFatoorah : 9, toyyibpay : 10
 function placeorder() {
-  $(".placeorder").prop("disabled", true);
-  $(".placeorder").html('<span class="loader"></span>');
   if (min_order_amount != null && min_order_amount != "") {
     if (parseInt(min_order_amount) > parseInt($("#sub_total").val())) {
       showtoast("error", min_order_amount_msg + " " + min_order_amount);
@@ -221,6 +243,8 @@ function placeorder() {
     }
   }
   ("use strict");
+  $(".placeorder").prop("disabled", true);
+  $(".placeorder").html('<span class="loader"></span>');
   if (check_data_empty() == 0) {
     $(".placeorder").prop("disabled", false);
     $(".placeorder").html(proceed_pay);
@@ -487,6 +511,7 @@ function placeorder() {
           $("#modal_offer_code").val($("#couponcode").val());
           $("#modal_offer_amount").val($("#discount_amount").val());
           $("#modal_transaction_type").val(transaction_type);
+          // $("#modal_product_price").val($('#product_price').val());
           $("#modal_buynow").val($("#buynow").val());
           $("#modalbankdetails").modal("show");
           $("#modalbankdetails").on("hidden.bs.modal", function(e) {

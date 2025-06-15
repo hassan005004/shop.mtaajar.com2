@@ -15,6 +15,7 @@ use App\Http\Controllers\admin\BannerController;
 use App\Http\Controllers\addons\included\BlogController;
 use App\Http\Controllers\admin\HowItWorkController;
 use App\Http\Controllers\admin\ThemeController;
+use App\Http\Controllers\admin\ShippingareaController;
 use App\Http\Controllers\admin\VendorController;
 use App\Http\Controllers\admin\OrderController;
 use App\Http\Controllers\admin\GlobalExtrasController;
@@ -343,6 +344,20 @@ if ($host == env('WEBSITE_HOST')) {
                                 Route::get('/', [OrderController::class, 'index']);
                                 Route::get('/update-{id}-{status}-{type}', [OrderController::class, 'update']);
                                 Route::post('/payment_status-{status}', [OrderController::class, 'payment_status']);
+                            }
+                        );
+                        // Shipping-area
+                        Route::group(
+                            ['prefix' => 'shipping-area'],
+                            function () {
+                                Route::get('/', [ShippingareaController::class, 'index']);
+                                Route::get('add', [ShippingareaController::class, 'add']);
+                                Route::get('show-{id}', [ShippingareaController::class, 'show']);
+                                Route::post('store', [ShippingareaController::class, 'store']);
+                                Route::post('update-{id}', [ShippingareaController::class, 'store']);
+                                Route::get('status-{id}-{status}', [ShippingareaController::class, 'status']);
+                                Route::get('delete-{id}', [ShippingareaController::class, 'delete']);
+                                Route::post('/reorder_shipping_area', [ShippingareaController::class, 'reorder_shipping_area']);
                             }
                         );
                         // Categories
